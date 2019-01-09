@@ -47,7 +47,9 @@ if ($action == 'setvalue' && $user->admin)
     if (! $result > 0) $error++;
     $result=dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC",GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_APIURL",GETPOST('DOLICONNECT_APIURL','alpha'),'chaine',0,'',0);
+    $result=dolibarr_set_const($db, "DOLICONNECT_USER",GETPOST('DOLICONNECT_USER','alpha'),'chaine',0,'',0);
+    if (! $result > 0) $error++;
+    $result=dolibarr_set_const($db, "DOLICONNECT_PASSWORD",GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
 	if (! $error)
   	{
@@ -104,9 +106,16 @@ print '</td></tr>';
 
 $var=!$var;
 print '<tr '.$bc[$var].'><td class="fieldrequired">';
-print $langs->trans("DOLICONNECT_APIURL").'</td><td>';
-print '<input size="80" type="text" name="DOLICONNECT_APIURL" value="'.$conf->global->DOLICONNECT_APIURL.'">';
-print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
+print $langs->trans("DOLICONNECT_USER").'</td><td>';
+print '<input size="80" type="text" name="DOLICONNECT_USER" value="'.$conf->global->DOLICONNECT_USER.'">';
+//print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
+print '</td></tr>';
+
+$var=!$var;
+print '<tr '.$bc[$var].'><td class="fieldrequired">';
+print $langs->trans("DOLICONNECT_PASSWORD").'</td><td>';
+print '<input size="80" type="text" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
+//print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
 print '</table>';

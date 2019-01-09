@@ -137,7 +137,7 @@ curl_setopt($curl,CURLOPT_URL,$url);
 curl_setopt($curl,CURLOPT_POSTFIELDS, $datac);
 curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,2); 
 curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-$httpheader = ['Authorization: Basic ' . base64_encode( $conf->global->DOLICONNECT_USER.':'.$conf->global->DOLICONNECT_PASSWORD )];
+$httpheader = ['Authorization: Basic ' . base64_encode( ''.$conf->global->DOLICONNECT_USER.':'.$conf->global->DOLICONNECT_PASSWORD.'' )];
 $httpheader[] = "Content-Type:application/json";
 curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheader);
 $response = curl_exec($curl);
