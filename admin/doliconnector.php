@@ -72,47 +72,39 @@ $form=new Form($db);
 
 llxHeader('',$langs->trans("DoliconnectorSetup"));
 
-
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
 print_fiche_titre($langs->trans("DoliconnectorSetup"),$linkback,'doliconnector@doliconnector');
+
+$head = doliconnector_admin_prepare_head();
+
+dol_fiche_head ( $head, 'doliconnector', $langs->trans ( "Module431310Name" ), 0, "" );
 
 print '<form method="post" action="'.$_SERVER["PHP_SELF"].'">';
 print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 print '<input type="hidden" name="action" value="setvalue">';
 
-$head = doliconnector_admin_prepare_head();
-dol_fiche_head ( $head, 'doliconnector', $langs->trans ( "Module431310Name" ), 0, "" );
-
-print $langs->trans("DoliconnectorDesc")."<br>\n";
-
-print "<br />";
-
-if (! empty($conf->multicompany->enabled))  {
-$linkentity="?entity=".$conf->entity;
-}
+print load_fiche_titre($langs->trans("DoliconnectorSetup"),'','');
 print '<table class="noborder" width="100%">';
-
-$var=true;
 print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("DOLICONNECT_PARAMETER").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
 print '<td>'.$langs->trans("Value").'</td>';
 print "</tr>\n";
 
 $var=!$var;
-print '<tr '.$bc[$var].'><td class="fieldrequired">';
+print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("AutomaticUserAssign").'</td><td>';
 print $form->select_dolusers($conf->global->DOLICONNECT_USER_AUTOMATIC, 'DOLICONNECT_USER_AUTOMATIC', 0);
 print '</td></tr>';
 
 $var=!$var;
-print '<tr '.$bc[$var].'><td class="fieldrequired">';
+print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_USER").'</td><td>';
 print '<input size="80" type="text" name="DOLICONNECT_USER" value="'.$conf->global->DOLICONNECT_USER.'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
 $var=!$var;
-print '<tr '.$bc[$var].'><td class="fieldrequired">';
+print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_PASSWORD").'</td><td>';
 print '<input size="80" type="text" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
