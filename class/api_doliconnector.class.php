@@ -263,7 +263,9 @@ $input=$customerstripe->sources->data;
 $list = array();
 if ( $input != null ) {
 foreach ( $input as $src ) {
+
 if ( $src->object=='card' ) {
+
 if ( $src->brand == 'Visa' ) {$brand='cc-visa';}
 elseif ( $src->brand == 'MasterCard' ) {$brand='cc-mastercard';}
 elseif ( $src->brand == 'American Express' ) {$brand='cc-amex';}
@@ -273,12 +275,9 @@ elseif ( $src->brand == 'Diners Club' ) {$brand='cc-diners-club';}
 else { $brand='credit-card';}
 $holder=$src->name;
 $reference='&#8226;&#8226;&#8226;&#8226;'.$src->last4; 
-$exp_date_month=$src->exp_month;
-$exp_date_year=$src->exp_year;
- if ( $src->country )
-	{
+$expiration = $src->card->exp_year.'/'.$src->card->exp_month;
 $country=$src->country;
-	}
+  
 } elseif ( $src->object=='source' ) {
 
 if ( $src->type == 'card' ) {
@@ -290,12 +289,14 @@ elseif ( $src->card->brand == 'Discover' ) {$brand='discover';}
 elseif ( $src->card->brand == 'JCB' ) {$brand='jcb';}
 elseif ( $src->card->brand == 'Diners Club' ) {$brand='diners-club';}
 $reference = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
+$expiration = $src->card->exp_year.'/'.$src->card->exp_month; 
 $country=$src->card->country;
 
 } elseif ( $src->type == 'sepa_debit' ) {
 
 $brand = 'fas fa-university';
 $reference = $src->sepa_debit->mandate_reference;
+$expiration = null;
 $country=$src->sepa_debit->country;
 
 }
@@ -311,7 +312,8 @@ $list[]= array(
         'type' => $src->type,		
 				'brand' => $brand,
         'holder' => $holder,
-        'reference' => $reference,  
+        'reference' => $reference,
+        'expiration' => $expiration,  
         'country' => $country,
         'default' => $default
 			);
