@@ -7,9 +7,11 @@ This module use REST API.
 
 This module required Dolibarr >=8.0.0 stable installation
 
-Support :  <https://www.ptibogxiv.net/> or <support@ptibogxiv.net>
+Support :  <https://www.ptibogxiv.net/> or <support@ptibogxiv.net> or <https://github.com/ptibogxiv/doliconnector/issues>
 
-Development :  <https://github.com/ptibogxiv/doliconnector> 
+Development : <https://github.com/ptibogxiv/doliconnector/pulls> 
+
+Updates :  <https://github.com/ptibogxiv/doliconnector/releases> 
 
 Thank you for your contribution
 
