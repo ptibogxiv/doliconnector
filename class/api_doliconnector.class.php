@@ -289,17 +289,13 @@ elseif ( $src->card->brand == 'American Express' ) {$brand='amex';}
 elseif ( $src->card->brand == 'Discover' ) {$brand='discover';}
 elseif ( $src->card->brand == 'JCB' ) {$brand='jcb';}
 elseif ( $src->card->brand == 'Diners Club' ) {$brand='diners-club';}
-$reference = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4; 
-$exp_date_month = $src->card->exp_month;
-$exp_date_year = $src->card->exp_year;
+$reference = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
 $country=$src->card->country;
 
 } elseif ( $src->type == 'sepa_debit' ) {
 
 $brand = 'fas fa-university';
-$reference = $src->sepa_debit->mandate_reference; 
-$exp_date_month = null;
-$exp_date_year = null;
+$reference = $src->sepa_debit->mandate_reference;
 $country=$src->sepa_debit->country;
 
 }
@@ -315,9 +311,7 @@ $list[]= array(
         'type' => $src->type,		
 				'brand' => $brand,
         'holder' => $holder,
-        'reference' => $reference,
-        'exp_date_month' => $exp_date_month,
-        'exp_date_year' => $exp_date_year,  
+        'reference' => $reference,  
         'country' => $country,
         'default' => $default
 			);
@@ -357,13 +351,13 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'code_client' => $stripecu,
       'com_countrycode' => getCountry($mysoc->country_code,2),
       'cus_countrycode' => $this->company->country_code,
-      'modeStripe' => $servicestatus,
 			'sources' => $list,
       'discount' => $amount_discount,
       'card' => $card,
       'sepa_direct' => $sepa,
       'RIB' => $rib,
       'CHQ' => $chq,
+      'STRIPE' => $servicestatus,
       'PAYPAL' => $paypalurl
 		);
     }            
