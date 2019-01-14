@@ -77,7 +77,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         $wdpr = $societeaccount->getCustomerAccount($fk_soc, 'wordpress', '1');
         
         if ( ! $wdpr ) {
-            throw new RestException(404, 'wordpress not found');
+            throw new RestException(404, 'wordpress #'.$id.' not found');
         }
 	$this->company->fetch($fk_soc);
        
@@ -134,12 +134,12 @@ $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestat
     {
         global $user,$conf;
        
-        $user = DolibarrApiAccess::$user;
+      $user = DolibarrApiAccess::$user;
 
       $this->company->fetch('', '', '', '', '', '', '', '', '', '', $email, '');
-
+      $doliconnector = new Daodoliconnector($this->db);
       
-      if (!$this->company->id > 0) {
+      if ( !$this->company->id > 0 ) {
       $this->company->name = $name;
       $this->company->email = $email;
       $this->company->client = 1;
@@ -154,8 +154,8 @@ $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestat
       
       if ( $wdpr != $id ) { 
       		$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
-					$sql .= " VALUES (".$this->company->id.", '', '".$db->escape($id)."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".DolibarrApiAccess::$user.")";
-					$resql = $db->query($sql);
+					$sql .= " VALUES (".$this->company->id.", '', '".$this->db->escape($id)."', 'wordpress', '1', " . $conf->entity . ", '".$this->db->idate(dol_now())."', ".DolibarrApiAccess::$user->id.")";
+					$resql = $this->db->query($sql);
       }
       
         if (! empty($conf->stripe->enabled))
