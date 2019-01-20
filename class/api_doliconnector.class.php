@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2017-2018 	Thibault FOUCART        <support@ptibogxiv.net>
+/* Copyright (C) 2017-2019 	Thibault FOUCART        <support@ptibogxiv.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -352,6 +352,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
   
   		return array(
       'publishable_key' => $publishable_key,
+      'secure_key' => $conf->global->PAYMENT_SECURITY_TOKEN,
       'code_account' => $stripeacc,
       'code_client' => $stripecu,
       'com_countrycode' => getCountry($mysoc->country_code,2),
