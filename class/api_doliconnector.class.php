@@ -263,61 +263,61 @@ $input=$customerstripe->sources->data;
 
 $list = array();
 
-if ( $input != null ) {
+if ( $input != null && count( $input) > 0 ) {
 
 //$list[]= array();
 
 foreach ( $input as $src ) {
 
-$list[$src->id][id] = $src->id;
-$list[$src->id][type] = $src->type;
+$list[$src->id]['id'] = $src->id;
+$list[$src->id]['type'] = $src->type;
 
 if ( $src->object=='card' ) {
 
-if ( $src->brand == 'Visa' ) { $list[$src->id][brand] = 'cc-visa'; }
-elseif ( $src->brand == 'MasterCard' ) { $list[$src->id][brand] = 'cc-mastercard'; }
-elseif ( $src->brand == 'American Express' ) { $list[$src->id][brand] = 'cc-amex'; }
-elseif ( $src->brand == 'Discover' ) { $list[$src->id][brand] = 'cc-discover'; }
-elseif ( $src->brand == 'JCB' ) { $list[$src->id][brand] = 'cc-jcb'; }
-elseif ( $src->brand == 'Diners Club' ) { $list[$src->id][brand] = 'cc-diners-club'; }
-else { $list[$src->id][brand] = 'credit-card'; }
-$list[$src->id][holder] = $src->name;
-$list[$src->id][reference] = '&#8226;&#8226;&#8226;&#8226;'.$src->last4; 
-$list[$src->id][expiration] = $src->card->exp_year.'/'.$src->card->exp_month;
-$list[$src->id][country] = $src->country;
+if ( $src->brand == 'Visa' ) { $list[$src->id]['brand'] = 'cc-visa'; }
+elseif ( $src->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'cc-mastercard'; }
+elseif ( $src->brand == 'American Express' ) { $list[$src->id]['brand'] = 'cc-amex'; }
+elseif ( $src->brand == 'Discover' ) { $list[$src->id]['brand'] = 'cc-discover'; }
+elseif ( $src->brand == 'JCB' ) { $list[$src->id]['brand'] = 'cc-jcb'; }
+elseif ( $src->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'cc-diners-club'; }
+else { $list[$src->id]['brand'] = 'credit-card'; }
+$list[$src->id]['holder'] = $src->name;
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->last4; 
+$list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month;
+$list[$src->id]['country'] = $src->country;
   
 } elseif ( $src->object=='source' ) {
 
-$list[$src->id][holder] = $src->owner->name;
+$list[$src->id]['holder'] = $src->owner->name;
 
 if ( $src->type == 'card' ) {
 
-if ( $src->card->brand == 'Visa' ) { $list[$src->id][brand] = 'visa';}
-elseif ( $src->card->brand == 'MasterCard' ) { $list[$src->id][brand] = 'mastercard';}
-elseif ( $src->card->brand == 'American Express' ) { $list[$src->id][brand] ='amex';}
-elseif ( $src->card->brand == 'Discover' ) { $list[$src->id][brand] = 'discover';}
-elseif ( $src->card->brand == 'JCB' ) { $list[$src->id][brand] = 'jcb';}
-elseif ( $src->card->brand == 'Diners Club' ) { $list[$src->id][brand] = 'diners-club';}
-$list[$src->id][reference] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
-$list[$src->id][expiration] = $src->card->exp_year.'/'.$src->card->exp_month; 
-$list[$src->id][country] = $src->card->country;
+if ( $src->card->brand == 'Visa' ) { $list[$src->id]['brand'] = 'visa';}
+elseif ( $src->card->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'mastercard';}
+elseif ( $src->card->brand == 'American Express' ) { $list[$src->id]['brand'] ='amex';}
+elseif ( $src->card->brand == 'Discover' ) { $list[$src->id]['brand'] = 'discover';}
+elseif ( $src->card->brand == 'JCB' ) { $list[$src->id]['brand'] = 'jcb';}
+elseif ( $src->card->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'diners-club';}
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
+$list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
+$list[$src->id]['country'] = $src->card->country;
 
 } elseif ( $src->type == 'sepa_debit' ) {
 
-$list[$src->id][brand] = 'fas fa-university';
-$list[$src->id][reference] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
-$list[$src->id][mandate_reference] = $src->sepa_debit->mandate_reference;
-$list[$src->id][mandate_url] = $src->sepa_debit->mandate_url;
-$list[$src->id][expiration] =  null;
-$list[$src->id][country] = $src->sepa_debit->country;
+$list[$src->id]['brand'] = 'fas fa-university';
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
+$list[$src->id]['mandate_reference'] = $src->sepa_debit->mandate_reference;
+$list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
+$list[$src->id]['expiration'] =  null;
+$list[$src->id]['country'] = $src->sepa_debit->country;
 
 }
 
 }
 
-if (($customerstripe->default_source!=$src->id)) {$default = null;}else {$default="1";}
+if ( ($customerstripe->default_source != $src->id) ) { $default = null; } else { $default="1"; }
 
-$list[$src->id][default_source]= $default;
+$list[$src->id]['default_source']= $default;
 
 } } else { $list=null; } 
 

@@ -51,21 +51,22 @@ if (! empty($socid) && $action=='create' && $confirm=='yes')
 	{
 $object = new Societe($db);
 $result=$object->fetch($socid);
+
+require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
+$generated_password=getRandomPassword(false);
+
 $data = array(
+  "username" => $object->name,
   "email" => $object->email,
-  "address" => $object->address,
-  "zip" => $object->zip,
-  "town" => $object->town,
-  "country_id" => $object->country_id,
-  "state_id" => $object->state_id,
-  "phone" => $object->phone
+  "password" => $generated_password,
+  "roles" => "subscriber",
 );
 $wordpress=new Daodoliconnector($db);
-$wordpress->doliconnectinf($object->id);
-$result=$wordpress->doliconnectSync("POST","",json_encode($data));
+//$wordpress->doliconnectinf($object->id);
+$result=$wordpress->doliconnectSync('POST', '/users/?username='.$object->name.'&email='.$object->email.'&password='.$generated_password, json_encode($data));
 $input=json_decode($result);                 	 
 $userid=$input->ID;  
-if ($userid>0) {
+if ( $userid > 0 ) {
 
             $sql  = "INSERT INTO  ".MAIN_DB_PREFIX."sync (fk_soc, wordpress, entity)";
             $sql .= " VALUES ('$socid', '".$userid."', '$entity')";
