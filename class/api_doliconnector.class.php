@@ -710,7 +710,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
-	        $paiement->addPaymentToBank(DolibarrApiAccess::$user,'payment',$label,$conf->global->STRIPE_BANK_ACCOUNT_FOR_PAYMENTS,'','');
+	        $paiement->addPaymentToBank(DolibarrApiAccess::$user, 'payment', $label, $conf->global->STRIPE_BANK_ACCOUNT_FOR_PAYMENTS, '', '');
 	        if ($result < 0)
 	        {
 	            $msg=$paiement->errors;
