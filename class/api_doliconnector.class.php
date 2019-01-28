@@ -327,7 +327,7 @@ $card=1;
 }
 //in_array("sepa_debit", $need->supported_payment_methods) && 
 if ( ( in_array($this->company->country_code, array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'SI', 'SK', 'GR', 'LT', 'MC', 'MT')) ) ) {
-$sepa=1;
+$sepa=0;
 }
 }
  
