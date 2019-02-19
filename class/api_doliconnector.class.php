@@ -326,8 +326,8 @@ if ( in_array("card", $need->supported_payment_methods) ) {
 $card=1;
 }
 //in_array("sepa_debit", $need->supported_payment_methods) && 
-if ( ( in_array($this->company->country_code, array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'SI', 'SK', 'GR', 'LT', 'MC', 'MT')) ) ) {
-$sepa=0;
+if ($conf->global->STRIPE_SEPA_DIRECT_DEBIT && ( in_array($this->company->country_code, array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'SI', 'SK', 'GR', 'LT', 'MC', 'MT')) ) ) {
+$sepa=1;
 }
 }
  
