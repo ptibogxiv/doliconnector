@@ -105,13 +105,25 @@ $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestat
   $member=new Adherent($this->db);
   $member->fetch('','',$this->company->id,'');
 }
+
+  if (! empty($conf->agefodd->enabled))
+  { 
+     $sql = "SELECT s.rowid as rowid, s.fk_soc, s.entity FROM ".MAIN_DB_PREFIX."agefodd_stagiaire as s";        
+     $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '$fk_soc' ";
+
+$result = $this->db->query($sql);
+if ($result)
+{
+$trainee = $this->db->fetch_object($result);
+} }
    
         return array(
             'fk_soc' => $fk_soc,
             'price_level' => $price_level,
             'outstanding_limit' => $this->company->outstanding_limit,
             'remise_percent' =>  $this->company->remise_percent,
-            'fk_member' => $member->id,           
+            'fk_member' => $member->id,
+            'fk_trainee' => $trainee->rowid,           
             'member_end' => $member->datefin,
             'fk_user' => $member->user_id,
             'fk_order' => $doliconnector->doliconnectorder($fk_soc),
