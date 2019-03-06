@@ -250,7 +250,7 @@ if (! empty($conf->stripe->enabled)) {
   
 $stripe=new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);								// Stripe OAuth connect account of dolibarr user (no network access here)
-$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
+//$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
@@ -350,7 +350,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'publishable_key' => $publishable_key,
       'secure_key' => $conf->global->PAYMENT_SECURITY_TOKEN,
       'code_account' => $stripeacc,
-      'code_client' => $stripecu,
+      'code_client' => $customerstripe->id,
       'com_countrycode' => getCountry($mysoc->country_code,2),
       'cus_countrycode' => $this->company->country_code,
 			'sources' => $list,
@@ -495,11 +495,10 @@ if (! empty($conf->stripe->enabled))
 		$servicestatus = 1;
 	}
 
-$stripe=new Stripe($this->db); 
+$stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);								// Stripe OAuth connect account of dolibarr user (no network access here)
-$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
-
-//$customer=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+//$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
+$stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
 $pos=strpos($source,'src_');
 
