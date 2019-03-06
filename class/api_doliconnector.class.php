@@ -81,20 +81,6 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         }
 	$this->company->fetch($fk_soc);
        
-  if (! empty($conf->stripe->enabled))
-{
-	$service = 'StripeTest';
-	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE))
-	{
-		$service = 'StripeLive';
-		$servicestatus = 1;
-	}
-$stripe=new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
-} 
-       
   if (! empty($conf->global->PRODUIT_MULTIPRICES))
 {      
   $price_level=$this->company->price_level;
