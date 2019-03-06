@@ -156,20 +156,6 @@ $trainee = $this->db->fetch_object($result);
 					$resql = $this->db->query($sql);
       }
       
-        if (! empty($conf->stripe->enabled))
-{
-	$service = 'StripeTest';
-	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE))
-	{
-		$service = 'StripeLive';
-		$servicestatus = 1;
-	}
-$stripe=new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
-} 
-      
   if (! empty($conf->global->PRODUIT_MULTIPRICES))
 {      
   $price_level=$this->company->price_level;
