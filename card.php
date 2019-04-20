@@ -128,9 +128,10 @@ elseif (! empty($socid) && $action=='delete' && $_GET["delcommid"])
 	if ($user->rights->societe->creer)
 	{
 
-            $sql  = "DELETE FROM  ".MAIN_DB_PREFIX."sync ";
-            $sql .= " WHERE wordpress =".$_GET["delcommid"];
-            $sql.= " AND entity IN (" . getEntity() . ")";
+            $sql  = "DELETE FROM ".MAIN_DB_PREFIX."societe_account ";
+            $sql .= " WHERE key_account =".$_GET["delcommid"];
+            $sql.= " AND site = 'wordpress' ";            
+            $sql.= " AND entity IN (" . getEntity('thirdparty') . ")";
             if (! $db->query($sql) )
             {
 setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, 'errors');            
@@ -201,7 +202,7 @@ if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
 $response=json_decode($result);
-  			  print $response->name.' ('.$response->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wordpress->wordpress.'">';
+  			  print $response->name.' ('.$response->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wdpr.'">';
 			    print img_delete();
 			    print '</a>'; 
 			}
