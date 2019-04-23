@@ -485,18 +485,19 @@ $hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1
 $hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
 $hideref = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
  
-if (! empty($conf->stripe->enabled))
-{
+if (! empty($conf->stripe->enabled)) {
 	$service = 'StripeTest';
 	$servicestatus = 0;
+  
 	if (! empty($conf->global->STRIPE_LIVE))
 	{
-		$service = 'StripeLive';
-		$servicestatus = 1;
+	$service = 'StripeLive';
+	$servicestatus = 1;
 	}
-
+  
 $stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
+$customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
 $pos=strpos($source,'src_');
