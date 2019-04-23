@@ -203,7 +203,7 @@ $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
 $response=json_decode($result);
   			  print $response->name.' ('.$response->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wdpr.'">';
-			    print img_delete();
+			    print img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink');
 			    print '</a>'; 
 			}
      		else
