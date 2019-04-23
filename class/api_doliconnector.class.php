@@ -249,8 +249,7 @@ if (! empty($conf->stripe->enabled)) {
 	}
   
 $stripe=new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);								// Stripe OAuth connect account of dolibarr user (no network access here)
-//$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
+$stripeacc = $stripe->getStripeAccount($service);
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
@@ -399,7 +398,7 @@ if (! empty($conf->stripe->enabled))
 	}
 
 	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
+	$stripeacc = $stripe->getStripeAccount($service);
 }
 
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
@@ -449,7 +448,7 @@ if (! empty($conf->stripe->enabled))
 	}
 
 	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
+	$stripeacc = $stripe->getStripeAccount($service);
 }
 
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
@@ -481,23 +480,22 @@ return $result;
 
 $result = $this->company->fetch($id);
 // PDF
-$hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
-$hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
-$hideref = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
+$hidedetails = (GETPOST('hidedetails', 'int') ? GETPOST('hidedetails', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0));
+$hidedesc = (GETPOST('hidedesc', 'int') ? GETPOST('hidedesc', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0));
+$hideref = (GETPOST('hideref', 'int') ? GETPOST('hideref', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0));
  
-if (! empty($conf->stripe->enabled)) {
+if (! empty($conf->stripe->enabled))
+{
 	$service = 'StripeTest';
 	$servicestatus = 0;
-  
 	if (! empty($conf->global->STRIPE_LIVE))
 	{
-	$service = 'StripeLive';
-	$servicestatus = 1;
+		$service = 'StripeLive';
+		$servicestatus = 1;
 	}
-  
+
 $stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
-$customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
 $pos=strpos($source,'src_');
