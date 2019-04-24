@@ -220,7 +220,7 @@ $trainee = $this->db->fetch_object($result);
      */
     function getSources($id)
     {
-    global $conf,$mysoc;
+    global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
     $result = $this->company->fetch($id);
@@ -368,15 +368,15 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
      *
      * @param int $id               ID of thirdparty
      * @param string $srcid         ID of source
-     * @param string $default         Default {@from body}
+     * @param int $default         Default {@from body}
      * @return int  ID of subscription
      *
      * @throws 401
      *
      * @url POST {id}/sources/{srcid}
      */
-    function addsource($id, $srcid, $default=null){
-    global $conf,$mysoc;
+    function addsource($id, $srcid, $default=null) {
+    global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
       if( ! $result ) {
@@ -404,13 +404,12 @@ if (! empty($conf->stripe->enabled))
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
 $customerstripe->sources->create(array("source" => "".$srcid.""));
 //}
-if ($default == '1') {
-$customerstripe->default_source=$srcid; 
+if ( !empty($default) ) {
+$customerstripe->default_source = (string) $srcid;
 }
-$customerstripe->save();
-
+$result = $customerstripe->save();
   
-  		return 1;
+return $result;
     }
     
     /**
@@ -418,7 +417,7 @@ $customerstripe->save();
      *
      * @param int $id               ID of thirdparty
      * @param string $srcid         ID of source
-     * @param string $default         Default {@from body}
+     * @param int $default         Default {@from body}
      * @return int  ID of subscription
      *
      * @throws 401
@@ -426,7 +425,7 @@ $customerstripe->save();
      * @url PUT {id}/sources/{srcid}
      */
     function updateSource($id, $srcid, $default=null){
-    global $conf,$mysoc;
+    global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
       if( ! $result ) {
