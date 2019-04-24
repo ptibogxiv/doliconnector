@@ -403,11 +403,14 @@ if (! empty($conf->stripe->enabled))
 
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
 $customerstripe->sources->create(array("source" => "".$srcid.""));
-//}
-if ( !empty($default) ) {
-$customerstripe->default_source = (string) $srcid;
-}
 $result = $customerstripe->save();
+
+if ( !empty($default) ) {
+$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+$customerstripe->default_source = (string) $srcid;
+$result2 = $customerstripe->save();
+}
+
   
 return $result;
     }
