@@ -253,46 +253,23 @@ $stripeacc = $stripe->getStripeAccount($service);
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
-$input=$customerstripe->sources->data;
+$input=\Stripe\PaymentMethod::all(["customer" => "".$customerstripe->id."", "type" => "card"])->data;
 }
 
 $list = array();
 
 if ( $input != null && count( $input) > 0 ) {
 
-//$list[]= array();
-
 foreach ( $input as $src ) {
 
 $list[$src->id]['id'] = $src->id;
 $list[$src->id]['type'] = $src->type;
 
-if ( $src->object=='card' ) {
-
-if ( $src->brand == 'Visa' ) { $list[$src->id]['brand'] = 'cc-visa'; }
-elseif ( $src->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'cc-mastercard'; }
-elseif ( $src->brand == 'American Express' ) { $list[$src->id]['brand'] = 'cc-amex'; }
-elseif ( $src->brand == 'Discover' ) { $list[$src->id]['brand'] = 'cc-discover'; }
-elseif ( $src->brand == 'JCB' ) { $list[$src->id]['brand'] = 'cc-jcb'; }
-elseif ( $src->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'cc-diners-club'; }
-else { $list[$src->id]['brand'] = 'credit-card'; }
-$list[$src->id]['holder'] = $src->name;
-$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->last4; 
-$list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month;
-$list[$src->id]['country'] = $src->country;
-  
-} elseif ( $src->object=='source' ) {
-
-$list[$src->id]['holder'] = $src->owner->name;
+$list[$src->id]['holder'] = $src->billing_details->name;
 
 if ( $src->type == 'card' ) {
 
-if ( $src->card->brand == 'Visa' ) { $list[$src->id]['brand'] = 'visa';}
-elseif ( $src->card->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'mastercard';}
-elseif ( $src->card->brand == 'American Express' ) { $list[$src->id]['brand'] ='amex';}
-elseif ( $src->card->brand == 'Discover' ) { $list[$src->id]['brand'] = 'discover';}
-elseif ( $src->card->brand == 'JCB' ) { $list[$src->id]['brand'] = 'jcb';}
-elseif ( $src->card->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'diners-club';}
+$list[$src->id]['brand'] = $src->card->brand;
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
 $list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
 $list[$src->id]['country'] = $src->card->country;
@@ -308,18 +285,16 @@ $list[$src->id]['country'] = $src->sepa_debit->country;
 
 }
 
-}
-
-if ( ($customerstripe->default_source != $src->id) ) { $default = null; } else { $default="1"; }
+if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
 
 } } else { $list=null; } 
 
-$need=\Stripe\CountrySpec::retrieve("".getCountry($mysoc->country_code,2)."");
-if ( in_array("card", $need->supported_payment_methods) ) {
-$card=1;
-}
+//$need=\Stripe\CountrySpec::retrieve("".getCountry($mysoc->country_code,2)."");
+//if ( in_array("card", $need->supported_payment_methods) ) {
+//$card=1;
+//}
 //in_array("sepa_debit", $need->supported_payment_methods) && 
 if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( $this->company->isInEEC() ) ) {
 $sepa=1;
