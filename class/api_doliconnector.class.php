@@ -473,7 +473,7 @@ if (! empty($conf->stripe->enabled))
 }
 
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-$customerstripe->default_source = (string) $srcid;
+$customerstripe->invoice_settings->default_payment_method = (string) $method;
 $result = $customerstripe->save();
   
 return $result;
