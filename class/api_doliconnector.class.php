@@ -373,13 +373,15 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);
 }
 
-
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
 //$customerstripe->sources->create(array("source" => "".$srcid.""));
 //$result = $customerstripe->save();   
 
 $payment_method = \Stripe\PaymentMethod::retrieve($method);
+
+if ($payment_method && $customerstripe) {
 $payment_method->attach(['customer' => $customerstripe->id]);
+}
 
 if ( !empty($default) ) {
 //$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
