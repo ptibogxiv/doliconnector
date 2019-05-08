@@ -472,9 +472,11 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);
 }
 
+if ($default) {
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
 $customerstripe->invoice_settings->default_payment_method = (string) $method;
 $result = $customerstripe->save();
+}
   
 return $result;
     }
