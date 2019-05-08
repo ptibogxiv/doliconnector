@@ -392,18 +392,18 @@ return $result;
     }
     
     /**
-     * Update a source to a thirdparty
+     * Update a payment method to a thirdparty
      *
      * @param int $id               ID of thirdparty
-     * @param string $srcid         ID of source
+     * @param string $method         ID of payment method
      * @param int $default         Default {@from body}
      * @return int  ID of subscription
      *
      * @throws 401
      *
-     * @url PUT {id}/sources/{srcid}
+     * @url PUT {id}/paymentmethods/{method}
      */
-    function updateSource($id, $srcid, $default=null){
+    function updatePaymentMethod($id, $method, $default=null){
     global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
