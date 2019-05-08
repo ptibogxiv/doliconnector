@@ -210,15 +210,15 @@ $trainee = $this->db->fetch_object($result);
     }
     
     /**
-     * Get thirdparty modepayment.
+     * Get payment methods for a thirdparty
      *
      * @param 	int 	$id ID of thirdparty
      *
-     * @url	GET {id}/sources
+     * @url	GET {id}/paymentmethods
      *
      * @return int
      */
-    function getSources($id)
+    function getPaymentMethod($id)
     {
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
@@ -347,7 +347,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
      *
      * @url POST {id}/paymentmethods/{method}
      */
-    function addsource($id, $method, $default=null) {
+    function addPaymentMethod($id, $method, $default=null) {
     global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
@@ -705,7 +705,7 @@ $invoice->set_paid(DolibarrApiAccess::$user);
      * 
      * @url DELETE {id}/paymentmethods/{method}
      */
-    function deleteSource($id, $method) {
+    function deletePaymentMethod($id, $method) {
     global $conf;
   
     $result = $this->company->fetch($id);
