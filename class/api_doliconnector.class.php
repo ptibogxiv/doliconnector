@@ -340,7 +340,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
      *
      * @param 	int 	$id ID of thirdparty
      *
-     * @url	GET {id}/paymentmethod/{method}
+     * @url	GET {id}/paymentmethods/{method}
      *
      * @return int
      */
@@ -375,7 +375,7 @@ $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestat
 
 $payment_method = \Stripe\PaymentMethod::retrieve($method);    
     
-return $method;    
+return $payment_method;    
     }              
     
     /**
