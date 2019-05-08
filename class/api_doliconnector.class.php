@@ -291,11 +291,8 @@ $list[$src->id]['default_source']= $default;
 
 } } else { $list=null; } 
 
-//$need=\Stripe\CountrySpec::retrieve("".getCountry($mysoc->country_code,2)."");
-//if ( in_array("card", $need->supported_payment_methods) ) {
-//$card=1;
-//}
-//in_array("sepa_debit", $need->supported_payment_methods) && 
+$card=1;
+
 if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( $this->company->isInEEC() ) ) {
 $sepa=1;
 }
