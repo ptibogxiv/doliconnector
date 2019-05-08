@@ -336,18 +336,18 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
     }            
     
     /**
-     * Add a source to a thirdparty
+     * Attach a payment method to a thirdparty
      *
      * @param int $id               ID of thirdparty
-     * @param string $srcid         ID of source
+     * @param string $method         ID of payment method
      * @param int $default         Default {@from body}
      * @return int  ID of subscription
      *
      * @throws 401
      *
-     * @url POST {id}/sources/{srcid}
+     * @url POST {id}/paymentmethods/{method}
      */
-    function addsource($id, $srcid, $default=null) {
+    function addsource($id, $method, $default=null) {
     global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
@@ -695,17 +695,17 @@ $invoice->set_paid(DolibarrApiAccess::$user);
     } 
 
      /**
-     * Delete source to a thirdparty
+     * Detach payment method to a thirdparty
      *
      * @param int		$id	Id of thirdparty
-     * @param string		$srcid	Id of source
+     * @param string		$method	Id of payment method
      *
      * @return mixed
      * @throws 401
      * 
-     * @url DELETE {id}/sources/{srcid}
+     * @url DELETE {id}/paymentmethods/{method}
      */
-    function deleteSource($id, $srcid) {
+    function deleteSource($id, $method) {
     global $conf;
   
     $result = $this->company->fetch($id);
@@ -731,18 +731,18 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
 }
 
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-				$card=$customerstripe->sources->retrieve("$srcid");
-				if ($card)
+//$customerstripe=$stripe->getPaymentMethodStripe($method, $stripeacc, $servicestatus);
+				$payment_method = \Stripe\PaymentMethod::retrieve($method);
+
+				if ($payment_method)
 				{
-					// $card->detach();  Does not work with card_, only with src_
-					if (method_exists($card, 'detach')) $card->detach();
-					else $card->delete();
-				}                                                               
+					$payment_method->detach();
+				}
+                                                                       
         return array(
             'success' => array(
                 'code' => 200,
-                'message' => 'Source deleted'
+                'message' => 'Payment method deleted'
             )
         );
     
