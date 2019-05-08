@@ -210,7 +210,7 @@ $trainee = $this->db->fetch_object($result);
     }
     
     /**
-     * Get payment methods for a thirdparty
+     * List payment methods for a thirdparty
      *
      * @param 	int 	$id ID of thirdparty
      *
@@ -218,7 +218,7 @@ $trainee = $this->db->fetch_object($result);
      *
      * @return int
      */
-    function getPaymentMethod($id)
+    function getListPaymentMethods($id)
     {
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
@@ -333,7 +333,50 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'STRIPE' => $servicestatus,
       'PAYPAL' => $paypalurl
 		);
-    }            
+    } 
+    
+    /**
+     * Get payment method for a thirdparty
+     *
+     * @param 	int 	$id ID of thirdparty
+     *
+     * @url	GET {id}/paymentmethod/{method}
+     *
+     * @return int
+     */
+    function getPaymentMethod($id, $method)
+    { 
+    global $conf, $mysoc;
+
+    $result = $this->company->fetch($id);
+      if( ! $result ) {
+          throw new RestException(404, 'Thirdparty not found');
+      }
+      
+      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id)) {
+        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+      }
+         
+if (! empty($conf->stripe->enabled))
+{
+	$service = 'StripeTest';
+	$servicestatus = 0;
+	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
+	{
+		$service = 'StripeLive';
+		$servicestatus = 1;
+	}
+
+	$stripe = new Stripe($this->db);
+	$stripeacc = $stripe->getStripeAccount($service);
+}
+
+$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
+
+$payment_method = \Stripe\PaymentMethod::retrieve($method);    
+    
+return $method;    
+    }              
     
     /**
      * Attach a payment method to a thirdparty
