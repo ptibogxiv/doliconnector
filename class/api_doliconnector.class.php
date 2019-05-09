@@ -248,19 +248,19 @@ if (! empty($conf->stripe->enabled)) {
   $publishable_key = $conf->global->STRIPE_LIVE_PUBLISHABLE_KEY; 
 	}
   
-$stripe=new Stripe($this->db); 
+$stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+$customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
-$input=\Stripe\PaymentMethod::all(["customer" => "".$customerstripe->id."", "type" => "card"])->data;
+$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
 }
 
 $list = array();
 
-if ( $input != null && count( $input) > 0 ) {
+if ( $listofpaymentmethods != null ) {
 
-foreach ( $input as $src ) {
+foreach ( $listofpaymentmethods as $src ) {
 
 $list[$src->id]['id'] = $src->id;
 $list[$src->id]['type'] = $src->type;
