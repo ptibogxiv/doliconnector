@@ -535,7 +535,7 @@ $source=$src->id;
 }
 }
 
-if ($object=='order') {
+if ($object=='orders') {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut==0 && $order->billed!=1) {
@@ -575,6 +575,7 @@ $error++;
 $ref=$order->ref;
 $currency=$order->multicurrency_code;
 $total=price2num($order->total_ttc);
+$origin='order';
 }
 elseif ($object=='invoice') {
 $invoice = new Facture($this->db);
@@ -586,6 +587,7 @@ $ref=$invoice->ref;
 $ifverif=$invoice->socid;
 $currency=$invoice->multicurrency_code;
 $total=price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits,'MT');
+$origin='invoice';
 }
 
 if ($item>0)
@@ -598,7 +600,7 @@ if ($src->object=='source' && $src->type=='card' && isset($src->card->three_d_se
 $description = "ORD=" . $ref . ".CUS=" . $id.".PM=stripe";
 		$metadata = array(
 			'dol_id' => "" . $item . "",
-			'dol_type' => "" . $object . "",
+			'dol_type' => "" . $origin . "",
 			'dol_thirdparty_id' => "" . $id . "",
       'FULLTAG' => $description,
       'dol_thirdparty_name' => $this->company->name,
@@ -622,7 +624,7 @@ $src2 = \Stripe\Source::create(array(
 
 if ($src2->three_d_secure->authenticated==false && $src2->redirect->status=='succeeded') {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$object,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;
 
 } else {
