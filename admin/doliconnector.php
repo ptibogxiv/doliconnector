@@ -43,14 +43,15 @@ $action = GETPOST('action','alpha');
 if ($action == 'setvalue' && $user->admin)
 {
 	$db->begin();
-    $result=dolibarr_set_const($db, "DOLICONNECT_APIKEY",GETPOST('DOLICONNECT_APIKEY','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_APIKEY", GETPOST('DOLICONNECT_APIKEY','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC",GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC", GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_USER",GETPOST('DOLICONNECT_USER','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_USER", GETPOST('DOLICONNECT_USER','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_PASSWORD",GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_PASSWORD", GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
+    $result = dolibarr_set_const($db, "DOLICONNECT_CATSHOP", GETPOST('DOLICONNECT_CATSHOP', 'alpha'), 'chaine', 0, '', $conf->entity);
 	if (! $error)
   	{
   		$db->commit();
@@ -89,6 +90,14 @@ print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Description").'</td>';
 print '<td>'.$langs->trans("Value").'</td>';
 print "</tr>\n";
+
+ // Root category for products
+print '<tr class="oddeven"><td>';
+print $form->textwithpicto($langs->trans("RootCategoryForDolishop"), $langs->trans("RootCategoryForDolishop"));
+print '<td colspan="2">';
+print $form->select_all_categories(Categorie::TYPE_PRODUCT, $conf->global->DOLICONNECT_CATSHOP, 'DOLICONNECT_CATSHOP', 64, 0, 0);
+print ajax_combobox('DOLICONNECT_CATSHOP');
+print "</td></tr>\n";
 
 $var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
