@@ -74,6 +74,7 @@ if ($action == 'setvalue' && $user->admin)
  */
 
 $form=new Form($db);
+$formproduct=new FormProduct($db);
 
 llxHeader('',$langs->trans("DoliconnectorSetup"));
 
