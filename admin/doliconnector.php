@@ -51,7 +51,10 @@ if ($action == 'setvalue' && $user->admin)
     if (! $result > 0) $error++;
     $result = dolibarr_set_const($db, "DOLICONNECT_PASSWORD", GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result = dolibarr_set_const($db, "DOLICONNECT_CATSHOP", GETPOST('DOLICONNECT_CATSHOP', 'alpha'), 'chaine', 0, '', $conf->entity);
+    $result = dolibarr_set_const($db, "DOLICONNECT_CATSHOP", GETPOST('DOLICONNECT_CATSHOP', 'alpha'), 'chaine', 0, '', $conf->entity);          
+	  if (! $result > 0) $error++;
+    $result = dolibarr_set_const($db, "DOLICONNECT_ID_WAREHOUSE", GETPOST('DOLICONNECT_ID_WAREHOUSE', 'alpha'), 'chaine', 0, '', $conf->entity);   
+    if (! $result > 0) $error++;
 	if (! $error)
   	{
   		$db->commit();
@@ -98,6 +101,12 @@ print '<td colspan="2">';
 print $form->select_all_categories(Categorie::TYPE_PRODUCT, $conf->global->DOLICONNECT_CATSHOP, 'DOLICONNECT_CATSHOP', 64, 0, 0);
 print ajax_combobox('DOLICONNECT_CATSHOP');
 print "</td></tr>\n";
+
+print '<tr class="oddeven"><td>'.$langs->trans("DoliconnectIdWareHouse").'</td>';	// Force warehouse (this is not a default value)
+print '<td colspan="2">';
+print $formproduct->selectWarehouses($conf->global->{'DOLICONNECT_ID_WAREHOUSE'.$terminal}, 'DOLICONNECT_ID_WAREHOUSE', '', 1, '');
+print ' <a href="'.DOL_URL_ROOT.'/product/stock/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"]).'">('.$langs->trans("Create").')</a>';
+print '</td></tr>';
 
 $var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
