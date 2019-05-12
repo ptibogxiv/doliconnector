@@ -29,7 +29,7 @@ Save you settings : a network admin or powerfull WordPress's user
 
 REST API module must be active on every entity on Dolibarr
 
-Your Wordpress needs free Doliconnect module for WordPress. It's available here https://wordpress.org/plugins/doliconnect/ 
+Your Wordpress needs free Doliconnect module for WordPress. It's available here <https://wordpress.org/plugins/doliconnect/> 
 
 You can enhance it with our Doliconnect PRO, with online shop and pay inside your WordPress
 Buy and download it on <https://www.ptibogxiv.net/>.
