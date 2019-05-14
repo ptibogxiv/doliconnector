@@ -577,7 +577,7 @@ $currency=$order->multicurrency_code;
 $total=price2num($order->total_ttc);
 $origin='order';
 }
-elseif ($object=='invoices') {
+elseif ($object=='invoice') {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $paiement = $invoice->getSommePaiement();
@@ -636,7 +636,7 @@ $error++;
 
 } else {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total,$currency,$object,$item,$source,$stripecu,$stripeacc,$servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
 
 }
@@ -648,7 +648,7 @@ $msg=$charge->message;
 $code=$charge->code;
 $error++;
 
-} elseif (isset($charge->id) && $charge->statut=='success' && $object=='orders') {
+} elseif (isset($charge->id) && $charge->statut=='success' && $object=='order') {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order,DolibarrApiAccess::$user);
 if ($idinv > 0)
@@ -718,7 +718,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	            $msg=$paiement->errors;
 	            $error++;
 	        }else{ 
-        if ($object=='orders') {
+        if ($object=='order') {
         $order->classifyBilled(DolibarrApiAccess::$user);
         }        
           }

@@ -56,7 +56,7 @@ if ($action == 'setvalue' && $user->admin)
 	  if (! $result > 0) $error++;
     $result = dolibarr_set_const($db, "DOLICONNECT_ID_WAREHOUSE", GETPOST('DOLICONNECT_ID_WAREHOUSE', 'alpha'), 'chaine', 0, '', $conf->entity);   
     if (! $result > 0) $error++;
-  if (! $error)
+	if (! $error)
   	{
   		$db->commit();
   		setEventMessage($langs->trans("SetupSaved"));

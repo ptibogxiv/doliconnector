@@ -118,7 +118,7 @@ public function doliconnectorderitem($id)
     	}
 	}  
   
-public function doliconnectSync($methodc, $url, $datac)
+public function doliconnectSync($methodc,$url,$datac)
 { 
 global $conf;
 
