@@ -210,7 +210,7 @@ $trainee = $this->db->fetch_object($result);
     }
     
     /**
-     * Get thirdparty modepayment.
+     * List payment methods for a thirdparty
      *
      * @param 	int 	$id ID of thirdparty
      *
@@ -218,9 +218,9 @@ $trainee = $this->db->fetch_object($result);
      *
      * @return int
      */
-    function getSources($id)
+    function getListPaymentMethods($id)
     {
-    global $conf,$mysoc;
+    global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
     $result = $this->company->fetch($id);
@@ -248,59 +248,35 @@ if (! empty($conf->stripe->enabled)) {
   $publishable_key = $conf->global->STRIPE_LIVE_PUBLISHABLE_KEY; 
 	}
   
-$stripe=new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);								// Stripe OAuth connect account of dolibarr user (no network access here)
-//$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+$stripe = new Stripe($this->db); 
+$stripeacc = $stripe->getStripeAccount($service);
+$customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
-$input=$customerstripe->sources->data;
+$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
 }
 
 $list = array();
 
-if ( $input != null && count( $input) > 0 ) {
+if ( $listofpaymentmethods != null ) {
 
-//$list[]= array();
-
-foreach ( $input as $src ) {
+foreach ( $listofpaymentmethods as $src ) {
 
 $list[$src->id]['id'] = $src->id;
 $list[$src->id]['type'] = $src->type;
 
-if ( $src->object=='card' ) {
-
-if ( $src->brand == 'Visa' ) { $list[$src->id]['brand'] = 'cc-visa'; }
-elseif ( $src->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'cc-mastercard'; }
-elseif ( $src->brand == 'American Express' ) { $list[$src->id]['brand'] = 'cc-amex'; }
-elseif ( $src->brand == 'Discover' ) { $list[$src->id]['brand'] = 'cc-discover'; }
-elseif ( $src->brand == 'JCB' ) { $list[$src->id]['brand'] = 'cc-jcb'; }
-elseif ( $src->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'cc-diners-club'; }
-else { $list[$src->id]['brand'] = 'credit-card'; }
-$list[$src->id]['holder'] = $src->name;
-$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->last4; 
-$list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month;
-$list[$src->id]['country'] = $src->country;
-  
-} elseif ( $src->object=='source' ) {
-
-$list[$src->id]['holder'] = $src->owner->name;
+$list[$src->id]['holder'] = $src->billing_details->name;
 
 if ( $src->type == 'card' ) {
 
-if ( $src->card->brand == 'Visa' ) { $list[$src->id]['brand'] = 'visa';}
-elseif ( $src->card->brand == 'MasterCard' ) { $list[$src->id]['brand'] = 'mastercard';}
-elseif ( $src->card->brand == 'American Express' ) { $list[$src->id]['brand'] ='amex';}
-elseif ( $src->card->brand == 'Discover' ) { $list[$src->id]['brand'] = 'discover';}
-elseif ( $src->card->brand == 'JCB' ) { $list[$src->id]['brand'] = 'jcb';}
-elseif ( $src->card->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'diners-club';}
+$list[$src->id]['brand'] = $src->card->brand;
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4; 
 $list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
 $list[$src->id]['country'] = $src->card->country;
 
 } elseif ( $src->type == 'sepa_debit' ) {
 
-$list[$src->id]['brand'] = 'fas fa-university';
+$list[$src->id]['brand'] = 'sepa_debit';
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
 $list[$src->id]['mandate_reference'] = $src->sepa_debit->mandate_reference;
 $list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
@@ -309,20 +285,15 @@ $list[$src->id]['country'] = $src->sepa_debit->country;
 
 }
 
-}
-
-if ( ($customerstripe->default_source != $src->id) ) { $default = null; } else { $default="1"; }
+if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
 
 } } else { $list=null; } 
 
-$need=\Stripe\CountrySpec::retrieve("".getCountry($mysoc->country_code,2)."");
-if ( in_array("card", $need->supported_payment_methods) ) {
 $card=1;
-}
-//in_array("sepa_debit", $need->supported_payment_methods) && 
-if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ($this->company->isInEEC())) {
+
+if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( $this->company->isInEEC() ) ) {
 $sepa=1;
 }
 }
@@ -362,22 +333,20 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'STRIPE' => $servicestatus,
       'PAYPAL' => $paypalurl
 		);
-    }            
+    } 
     
     /**
-     * Add a source to a thirdparty
+     * Get payment method for a thirdparty
      *
-     * @param int $id               ID of thirdparty
-     * @param string $srcid         ID of source
-     * @param string $default         Default {@from body}
-     * @return int  ID of subscription
+     * @param 	int 	$id ID of thirdparty
      *
-     * @throws 401
+     * @url	GET {id}/paymentmethods/{method}
      *
-     * @url POST {id}/paymentmethods/{srcid}
+     * @return int
      */
-    function addsource($id, $srcid, $default=null){
-    global $conf,$mysoc;
+    function getPaymentMethod($id, $method)
+    { 
+    global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
       if( ! $result ) {
@@ -399,35 +368,86 @@ if (! empty($conf->stripe->enabled))
 	}
 
 	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
+	$stripeacc = $stripe->getStripeAccount($service);
 }
 
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-$customerstripe->sources->create(array("source" => "".$srcid.""));
-//}
-if ($default == '1') {
-$customerstripe->default_source=$srcid; 
+$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
+
+$payment_method = \Stripe\PaymentMethod::retrieve($method);    
+    
+return $payment_method;    
+    }              
+    
+    /**
+     * Attach a payment method to a thirdparty
+     *
+     * @param int $id               ID of thirdparty
+     * @param string $method         ID of payment method
+     * @param int $default         Default {@from body}
+     * @return int  ID of subscription
+     *
+     * @throws 401
+     *
+     * @url POST {id}/paymentmethods/{method}
+     */
+    function addPaymentMethod($id, $method, $default=null) {
+    global $conf, $mysoc;
+
+    $result = $this->company->fetch($id);
+      if( ! $result ) {
+          throw new RestException(404, 'Thirdparty not found');
+      }
+      
+      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id)) {
+        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+      }
+         
+if (! empty($conf->stripe->enabled))
+{
+	$service = 'StripeTest';
+	$servicestatus = 0;
+	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
+	{
+		$service = 'StripeLive';
+		$servicestatus = 1;
+	}
+
+	$stripe = new Stripe($this->db);
+	$stripeacc = $stripe->getStripeAccount($service);
 }
-$customerstripe->save();
+
+$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
+
+$payment_method = \Stripe\PaymentMethod::retrieve($method);
+
+if ($payment_method && $customerstripe) {
+$result = $payment_method->attach(['customer' => $customerstripe->id]);
+}
+
+if ( !empty($default) ) {
+//$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+//$customerstripe->default_source = (string) $srcid;
+//$result2 = $customerstripe->save();
+}
 
   
-  		return 1;
+return $result;
     }
     
     /**
-     * Update a source to a thirdparty
+     * Update a payment method to a thirdparty
      *
      * @param int $id               ID of thirdparty
-     * @param string $srcid         ID of source
-     * @param string $default         Default {@from body}
+     * @param string $method         ID of payment method
+     * @param int $default         Default {@from body}
      * @return int  ID of subscription
      *
      * @throws 401
      *
-     * @url PUT {id}/paymentmethods/{srcid}
+     * @url PUT {id}/paymentmethods/{method}
      */
-    function updateSource($id, $srcid, $default=null){
-    global $conf,$mysoc;
+    function updatePaymentMethod($id, $method, $default=null){
+    global $conf, $mysoc;
 
     $result = $this->company->fetch($id);
       if( ! $result ) {
@@ -449,12 +469,14 @@ if (! empty($conf->stripe->enabled))
 	}
 
 	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
+	$stripeacc = $stripe->getStripeAccount($service);
 }
 
+if ($default) {
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-$customerstripe->default_source = (string) $srcid;
+$customerstripe->invoice_settings->default_payment_method = (string) $method;
 $result = $customerstripe->save();
+}
   
 return $result;
     }
@@ -496,8 +518,7 @@ if (! empty($conf->stripe->enabled))
 	}
 
 $stripe = new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);								// Stripe OAuth connect account of dolibarr user (no network access here)
-//$stripecu = $stripe->getStripeCustomerAccount($id, $servicestatus);		// Get thirdparty cu_...
+$stripeacc = $stripe->getStripeAccount($service);
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
 $pos=strpos($source,'src_');
@@ -603,7 +624,7 @@ $src2 = \Stripe\Source::create(array(
 
 if ($src2->three_d_secure->authenticated==false && $src2->redirect->status=='succeeded') {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$object,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;
 
 } else {
@@ -725,17 +746,17 @@ $invoice->set_paid(DolibarrApiAccess::$user);
     } 
 
      /**
-     * Delete source to a thirdparty
+     * Detach payment method to a thirdparty
      *
      * @param int		$id	Id of thirdparty
-     * @param string		$srcid	Id of source
+     * @param string		$method	Id of payment method
      *
      * @return mixed
      * @throws 401
      * 
-     * @url DELETE {id}/sources/{srcid}
+     * @url DELETE {id}/paymentmethods/{method}
      */
-    function deleteSource($id, $srcid) {
+    function deletePaymentMethod($id, $method) {
     global $conf;
   
     $result = $this->company->fetch($id);
@@ -761,18 +782,18 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
 }
 
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-				$card=$customerstripe->sources->retrieve("$srcid");
-				if ($card)
+//$customerstripe=$stripe->getPaymentMethodStripe($method, $stripeacc, $servicestatus);
+				$payment_method = \Stripe\PaymentMethod::retrieve($method);
+
+				if ($payment_method)
 				{
-					// $card->detach();  Does not work with card_, only with src_
-					if (method_exists($card, 'detach')) $card->detach();
-					else $card->delete();
-				}                                                               
+					$payment_method->detach();
+				}
+                                                                       
         return array(
             'success' => array(
                 'code' => 200,
-                'message' => 'Source deleted'
+                'message' => 'Payment method deleted'
             )
         );
     

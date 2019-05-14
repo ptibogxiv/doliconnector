@@ -5,7 +5,7 @@ The sharing of yours Dolibarr's informations on your WordPress website compatibl
 
 This module use REST API.
 
-This module required Dolibarr >=8.0.0 stable installation
+This module required Dolibarr >=10.0.0 stable installation
 
 Support :  <https://www.ptibogxiv.net/> or <support@ptibogxiv.net> or <https://github.com/ptibogxiv/doliconnector/issues>
 

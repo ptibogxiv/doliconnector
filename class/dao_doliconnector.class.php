@@ -80,7 +80,7 @@ public function doliconnectorder($fk_soc)
 
     	$sql = "SELECT rowid";
     	$sql.= " FROM ".MAIN_DB_PREFIX."commande ";
-    	$sql.= " WHERE fk_soc ='" .$fk_soc."' AND fk_statut='0' ";
+    	$sql.= " WHERE fk_soc ='" .$fk_soc."' AND fk_statut='0' and module_source='doliconnect' ";
       $sql.= " ORDER BY rowid DESC LIMIT 1";
  
       $resql = $this->db->query($sql);
