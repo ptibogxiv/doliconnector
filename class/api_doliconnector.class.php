@@ -214,7 +214,7 @@ $trainee = $this->db->fetch_object($result);
      *
      * @param 	int 	$id ID of thirdparty
      *
-     * @url	GET {id}/sources
+     * @url	GET {id}/paymentmethods
      *
      * @return int
      */
@@ -294,7 +294,7 @@ elseif ( $src->card->brand == 'American Express' ) { $list[$src->id]['brand'] ='
 elseif ( $src->card->brand == 'Discover' ) { $list[$src->id]['brand'] = 'discover';}
 elseif ( $src->card->brand == 'JCB' ) { $list[$src->id]['brand'] = 'jcb';}
 elseif ( $src->card->brand == 'Diners Club' ) { $list[$src->id]['brand'] = 'diners-club';}
-$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4.' - '.$src->card->exp_month.'/'.$src->card->exp_year; 
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4; 
 $list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
 $list[$src->id]['country'] = $src->card->country;
 
@@ -322,7 +322,7 @@ if ( in_array("card", $need->supported_payment_methods) ) {
 $card=1;
 }
 //in_array("sepa_debit", $need->supported_payment_methods) && 
-if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( in_array($this->company->country_code, array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'SI', 'SK', 'GR', 'LT', 'MC', 'MT')) ) ) {
+if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ($this->company->isInEEC())) {
 $sepa=1;
 }
 }
@@ -353,7 +353,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'code_client' => $customerstripe->id,
       'com_countrycode' => getCountry($mysoc->country_code,2),
       'cus_countrycode' => $this->company->country_code,
-			'sources' => $list,
+			'paymentmethods' => $list,
       'discount' => $amount_discount,
       'card' => $card,
       'sepa_direct_debit' => $sepa,
@@ -374,7 +374,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
      *
      * @throws 401
      *
-     * @url POST {id}/sources/{srcid}
+     * @url POST {id}/paymentmethods/{srcid}
      */
     function addsource($id, $srcid, $default=null){
     global $conf,$mysoc;
@@ -424,7 +424,7 @@ $customerstripe->save();
      *
      * @throws 401
      *
-     * @url PUT {id}/sources/{srcid}
+     * @url PUT {id}/paymentmethods/{srcid}
      */
     function updateSource($id, $srcid, $default=null){
     global $conf,$mysoc;
@@ -514,7 +514,7 @@ $source=$src->id;
 }
 }
 
-if ($object=='order') {
+if ($object=='orders') {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut==0 && $order->billed!=1) {
@@ -554,8 +554,9 @@ $error++;
 $ref=$order->ref;
 $currency=$order->multicurrency_code;
 $total=price2num($order->total_ttc);
+$origin='order';
 }
-elseif ($object=='invoice') {
+elseif ($object=='invoices') {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $paiement = $invoice->getSommePaiement();
@@ -565,6 +566,7 @@ $ref=$invoice->ref;
 $ifverif=$invoice->socid;
 $currency=$invoice->multicurrency_code;
 $total=price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits,'MT');
+$origin='invoice';
 }
 
 if ($item>0)
@@ -577,7 +579,7 @@ if ($src->object=='source' && $src->type=='card' && isset($src->card->three_d_se
 $description = "ORD=" . $ref . ".CUS=" . $id.".PM=stripe";
 		$metadata = array(
 			'dol_id' => "" . $item . "",
-			'dol_type' => "" . $object . "",
+			'dol_type' => "" . $origin . "",
 			'dol_thirdparty_id' => "" . $id . "",
       'FULLTAG' => $description,
       'dol_thirdparty_name' => $this->company->name,
@@ -613,7 +615,7 @@ $error++;
 
 } else {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$object,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
 
 }
@@ -625,7 +627,7 @@ $msg=$charge->message;
 $code=$charge->code;
 $error++;
 
-} elseif (isset($charge->id) && $charge->statut=='success' && $object=='order') {
+} elseif (isset($charge->id) && $charge->statut=='success' && $object=='orders') {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order,DolibarrApiAccess::$user);
 if ($idinv > 0)
@@ -695,7 +697,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	            $msg=$paiement->errors;
 	            $error++;
 	        }else{ 
-        if ($object=='order') {
+        if ($object=='orders') {
         $order->classifyBilled(DolibarrApiAccess::$user);
         }        
           }

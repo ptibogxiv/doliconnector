@@ -30,6 +30,7 @@ require_once '../class/actions_doliconnector.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 
 $servicename='doliconnector';
 
@@ -43,15 +44,19 @@ $action = GETPOST('action','alpha');
 if ($action == 'setvalue' && $user->admin)
 {
 	$db->begin();
-    $result=dolibarr_set_const($db, "DOLICONNECT_APIKEY",GETPOST('DOLICONNECT_APIKEY','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_APIKEY", GETPOST('DOLICONNECT_APIKEY','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC",GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC", GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_USER",GETPOST('DOLICONNECT_USER','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_USER", GETPOST('DOLICONNECT_USER','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-    $result=dolibarr_set_const($db, "DOLICONNECT_PASSWORD",GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
+    $result = dolibarr_set_const($db, "DOLICONNECT_PASSWORD", GETPOST('DOLICONNECT_PASSWORD','alpha'),'chaine',0,'',0);
     if (! $result > 0) $error++;
-	if (! $error)
+    $result = dolibarr_set_const($db, "DOLICONNECT_CATSHOP", GETPOST('DOLICONNECT_CATSHOP', 'alpha'), 'chaine', 0, '', $conf->entity);          
+	  if (! $result > 0) $error++;
+    $result = dolibarr_set_const($db, "DOLICONNECT_ID_WAREHOUSE", GETPOST('DOLICONNECT_ID_WAREHOUSE', 'alpha'), 'chaine', 0, '', $conf->entity);   
+    if (! $result > 0) $error++;
+  if (! $error)
   	{
   		$db->commit();
   		setEventMessage($langs->trans("SetupSaved"));
@@ -69,6 +74,7 @@ if ($action == 'setvalue' && $user->admin)
  */
 
 $form=new Form($db);
+$formproduct=new FormProduct($db);
 
 llxHeader('',$langs->trans("DoliconnectorSetup"));
 
@@ -89,6 +95,20 @@ print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Description").'</td>';
 print '<td>'.$langs->trans("Value").'</td>';
 print "</tr>\n";
+
+ // Root category for products
+print '<tr class="oddeven"><td>';
+print $form->textwithpicto($langs->trans("RootCategoryForDolishop"), $langs->trans("RootCategoryForDolishop"));
+print '<td colspan="2">';
+print $form->select_all_categories(Categorie::TYPE_PRODUCT, $conf->global->DOLICONNECT_CATSHOP, 'DOLICONNECT_CATSHOP', 64, 0, 0);
+print ajax_combobox('DOLICONNECT_CATSHOP');
+print "</td></tr>\n";
+
+print '<tr class="oddeven"><td>'.$langs->trans("DoliconnectIdWareHouse").'</td>';	// Force warehouse (this is not a default value)
+print '<td colspan="2">';
+print $formproduct->selectWarehouses($conf->global->{'DOLICONNECT_ID_WAREHOUSE'.$terminal}, 'DOLICONNECT_ID_WAREHOUSE', '', 1, '');
+print ' <a href="'.DOL_URL_ROOT.'/product/stock/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"]).'">('.$langs->trans("Create").')</a>';
+print '</td></tr>';
 
 $var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
