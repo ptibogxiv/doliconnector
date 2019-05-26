@@ -253,7 +253,8 @@ $stripeacc = $stripe->getStripeAccount($service);
 $customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
                                                                                                
 if ($customerstripe->id) {
-$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
+//$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
+$listofpaymentmethods = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
 }
 
 $list = array();
