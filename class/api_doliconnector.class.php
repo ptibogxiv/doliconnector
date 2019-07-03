@@ -209,6 +209,23 @@ $trainee = $this->db->fetch_object($result);
         return array("value" => $conf->global->$id);
     }
     
+     /**
+     * Get payment intent of an object
+     *
+     * Return an array with payment intent
+     *
+     * @param     string     $idobject Type ob object (order, invoice...)
+     * @param     int     $id ID of object
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    function getPaymentIntent($idobject, $id)
+    {
+        global $conf;
+        return array("value" => $conf->global->$id);
+    }    
+    
     /**
      * List payment methods for a thirdparty
      *
