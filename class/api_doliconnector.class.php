@@ -260,7 +260,7 @@ if ($type == 'order')
 	$amount=$object->total_ttc;
 	$amount=price2num($amount);
 
-	$fulltag='ORD='.$order->id.'.CUS='.$object->thirdparty->id;
+	$fulltag='ORD='.$object->id.'.CUS='.$object->thirdparty->id;
 	$tag=null;
 	$fulltag=dol_string_unaccent($fulltag);  
 }  
