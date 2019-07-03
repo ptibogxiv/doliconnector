@@ -419,16 +419,16 @@ if (! empty($conf->stripe->enabled))
 
 $customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
 
-$payment_method = \Stripe\PaymentMethod::retrieve($method);
+$payment_method = \Stripe\PaymentMethod::retrieve($method, ["stripe_account" => $stripeacc]);
 
 if ($payment_method && $customerstripe) {
 $result = $payment_method->attach(['customer' => $customerstripe->id]);
 }
 
-if ( !empty($default) ) {
-//$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-//$customerstripe->default_source = (string) $srcid;
-//$result2 = $customerstripe->save();
+if ($default) {
+$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+$customerstripe->invoice_settings->default_payment_method = (string) $method;
+$result = $customerstripe->save();
 }
 
   
@@ -783,13 +783,25 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
 }
 
-//$customerstripe=$stripe->getPaymentMethodStripe($method, $stripeacc, $servicestatus);
-				$payment_method = \Stripe\PaymentMethod::retrieve($method);
-
-				if ($payment_method)
+				if (preg_match('/pm_/', $method))
 				{
-					$payment_method->detach();
+            $payment_method = \Stripe\PaymentMethod::retrieve($method, ["stripe_account" => $stripeacc]);
+            if ($payment_method)
+				    {
+					  $payment_method->detach();
+				    }
+        }
+        else
+				{
+				$cu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+				$card=$cu->sources->retrieve("$method");
+				if ($card)
+				{
+					// $card->detach();  Does not work with card_, only with src_
+					if (method_exists($card, 'detach')) $card->detach();
+					else $card->delete();
 				}
+        }
                                                                        
         return array(
             'success' => array(

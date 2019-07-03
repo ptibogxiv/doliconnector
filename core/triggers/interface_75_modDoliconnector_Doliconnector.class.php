@@ -130,7 +130,7 @@ $ok=0;
 		$wdpr = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
 
     if ( $wdpr > 0 ) { 
-    //$result=$wordpress->doliconnectorSync("POST", '/users/'.$wdpr.'/?context=edit', json_encode($object));
+    //$result=$wordpress->doliconnectorSync("POST", '/users/'.$wdpr, json_encode($object));
     //$input=json_decode($result);                 	 
     $ok=$input->ok;
 	 } 
