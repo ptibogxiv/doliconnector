@@ -261,8 +261,7 @@ if ($type == 'order')
 	$amount=price2num($amount);
 
 	$fulltag='ORD='.$order->id.'.CUS='.$order->thirdparty->id;
-	$tag=$TAG; 
-  $fulltag.='.TAG='.$TAG;
+	$tag=null;
 	$fulltag=dol_string_unaccent($fulltag);  
 }  
   
