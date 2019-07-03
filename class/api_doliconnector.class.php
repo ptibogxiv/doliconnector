@@ -214,13 +214,16 @@ $trainee = $this->db->fetch_object($result);
      *
      * Return an array with payment intent
      *
-     * @param     string     $idobject Type ob object (order, invoice...)
+     * @param     int     $id ID of thirdparty
+     * @param     string  $objectid Type ob object (order, invoice...)
      * @param     int     $id ID of object
      * @return    array|mixed data without useless information
      *
+     * @url	GET {id}/paymentintent/{objectid}/{id}
+     *     
      * @throws    RestException
      */
-    function getPaymentIntent($idobject, $id)
+    function getPaymentIntent($objectid, $id)
     {
         global $conf;
         return array("value" => $conf->global->$id);
