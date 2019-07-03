@@ -226,6 +226,31 @@ $trainee = $this->db->fetch_object($result);
     function getPaymentIntent($objectid, $id)
     {
         global $conf;
+
+if (! empty($conf->stripe->enabled)) {
+	$service = 'StripeTest';
+	$servicestatus = 0;
+  
+	$publishable_key = $conf->global->STRIPE_TEST_PUBLISHABLE_KEY;  
+  
+	if (! empty($conf->global->STRIPE_LIVE))
+	{
+	$service = 'StripeLive';
+	$servicestatus = 1;
+    
+  $publishable_key = $conf->global->STRIPE_LIVE_PUBLISHABLE_KEY; 
+	}
+  
+      $stripe = new Stripe($this->db); 
+      $stripeacc = $stripe->getStripeAccount($service);
+			$stripecu = null;
+			if (is_object($object) && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
+
+				$paymentintent=$stripe->getPaymentIntent($amount, $currency, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
+				if ($stripe->error) setEventMessages($stripe->error, null, 'errors');
+		}
+      
+        
         return array("value" => $conf->global->$id);
     }    
     
