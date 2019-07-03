@@ -257,10 +257,10 @@ if ($type == 'order')
 	}
 	$object = $order;
 
-	$amount=$order->total_ttc;
+	$amount=$object->total_ttc;
 	$amount=price2num($amount);
 
-	$fulltag='ORD='.$order->id.'.CUS='.$order->thirdparty->id;
+	$fulltag='ORD='.$order->id.'.CUS='.$object->thirdparty->id;
 	$tag=null;
 	$fulltag=dol_string_unaccent($fulltag);  
 }  
