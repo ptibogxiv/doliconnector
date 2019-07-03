@@ -244,7 +244,7 @@ if ($type == 'order')
 {
 	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
-	$order=new Commande($db);
+	$order=new Commande($this->db);
 	$result=$order->fetch($id);
 	if ($result <= 0)
 	{
@@ -261,7 +261,8 @@ if ($type == 'order')
 	$amount=price2num($amount);
 
 	$fulltag='ORD='.$order->id.'.CUS='.$order->thirdparty->id;
-	if (! empty($TAG)) { $tag=$TAG; $fulltag.='.TAG='.$TAG; }
+	$tag=$TAG; 
+  $fulltag.='.TAG='.$TAG;
 	$fulltag=dol_string_unaccent($fulltag);  
 }  
   
@@ -270,7 +271,7 @@ if ($type == 'order')
 			$stripecu = null;
 			if (is_object($object) && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
 
-			$paymentintent=$stripe->getPaymentIntent($amount, $currency, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
+			$paymentintent=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
 		}
 
         return $paymentintent;
