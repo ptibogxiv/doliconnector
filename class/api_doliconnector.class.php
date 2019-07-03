@@ -214,16 +214,15 @@ $trainee = $this->db->fetch_object($result);
      *
      * Return an array with payment intent
      *
-     * @param     int     $id ID of thirdparty
-     * @param     string  $objectid Type ob object (order, invoice...)
+     * @param     string  $type Type of object (order, invoice...)
      * @param     int     $id ID of object
      * @return    array|mixed data without useless information
      *
-     * @url	GET {id}/paymentintent/{objectid}/{id}
+     * @url	GET paymentintent/{type}/{id}
      *     
      * @throws    RestException
      */
-    function getPaymentIntent($objectid, $id)
+    function getPaymentIntent($type, $id)
     {
         global $conf;
 
@@ -241,17 +240,40 @@ if (! empty($conf->stripe->enabled)) {
   $publishable_key = $conf->global->STRIPE_LIVE_PUBLISHABLE_KEY; 
 	}
   
+if ($type == 'order')
+{
+	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
+
+	$order=new Commande($db);
+	$result=$order->fetch($id);
+	if ($result <= 0)
+	{
+		$mesg=$order->error;
+		$error++;
+	}
+	else
+	{
+		$result=$order->fetch_thirdparty($order->socid);
+	}
+	$object = $order;
+
+	$amount=$order->total_ttc;
+	$amount=price2num($amount);
+
+	$fulltag='ORD='.$order->id.'.CUS='.$order->thirdparty->id;
+	if (! empty($TAG)) { $tag=$TAG; $fulltag.='.TAG='.$TAG; }
+	$fulltag=dol_string_unaccent($fulltag);  
+}  
+  
       $stripe = new Stripe($this->db); 
       $stripeacc = $stripe->getStripeAccount($service);
 			$stripecu = null;
 			if (is_object($object) && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
 
-				$paymentintent=$stripe->getPaymentIntent($amount, $currency, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
-				if ($stripe->error) setEventMessages($stripe->error, null, 'errors');
+			$paymentintent=$stripe->getPaymentIntent($amount, $currency, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
 		}
-      
-        
-        return array("value" => $conf->global->$id);
+
+        return $paymentintent;
     }    
     
     /**
