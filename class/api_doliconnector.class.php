@@ -396,10 +396,11 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'discount' => $amount_discount,
       'card' => $card,
       'sepa_direct_debit' => $sepa,
+      'payment_request_api' => $sepa,
       'RIB' => $rib,
       'CHQ' => $chq,
-      'STRIPE' => $servicestatus,
-      'PAYPAL' => $paypalurl
+      'stripe' => $servicestatus,
+      'paypal' => $paypalurl
 		);
     } 
     
