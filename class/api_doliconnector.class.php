@@ -240,6 +240,8 @@ if (! empty($conf->stripe->enabled)) {
   $publishable_key = $conf->global->STRIPE_LIVE_PUBLISHABLE_KEY; 
 	}
   
+$paymentintent=array();
+
 if ($type == 'order')
 {
 	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
@@ -259,7 +261,7 @@ if ($type == 'order')
 
 	$amount=$object->total_ttc;
 	$amount=price2num($amount);
-
+  $currency=$object->multicurrency_code;
 	$fulltag='ORD='.$object->id.'.CUS='.$object->thirdparty->id;
 	$tag=null;
 	$fulltag=dol_string_unaccent($fulltag);  
@@ -270,9 +272,18 @@ if ($type == 'order')
 			$stripecu = null;
 			if (is_object($object) && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
 
-			$paymentintent=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
-		}
-
+		$pi=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
+		$paymentintent['stripe']['id']=$pi->id;
+    $paymentintent['stripe']['client_secret']=$pi->client_secret;
+    }
+    
+    if (! empty($conf->paypal->enabled)) {
+    $paymentintent['paypal']['url']="";
+    }
+    $paymentintent['public_url']="";
+    $paymentintent['amount']=$amount;
+    $paymentintent['currency']=$currency;
+    
         return $paymentintent;
     }    
     
