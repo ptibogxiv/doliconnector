@@ -271,7 +271,7 @@ if ($type == 'order')
       $stripe = new Stripe($this->db); 
       $stripeacc = $stripe->getStripeAccount($service);
 			$stripecu = null;
-			if (is_object($object) && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
+			if (is_object($object) && $object->id >0 && is_object($object->thirdparty)) $stripecu = $stripe->customerStripe($object->thirdparty, $stripeacc, $servicestatus, 1);
 
 		$pi=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
 		$paymentintent['stripe']['id']=$pi->id;
