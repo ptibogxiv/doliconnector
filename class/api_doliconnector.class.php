@@ -44,6 +44,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 require_once DOL_DOCUMENT_ROOT.'/stripe/config.php';
 require_once DOL_DOCUMENT_ROOT.'/stripe/class/stripe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/paypal/lib/paypal.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/paypal/lib/paypalfunctions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
@@ -280,7 +281,7 @@ if ($type == 'order')
     if (! empty($conf->paypal->enabled)) {
     $paymentintent['paypal']['url']="";
     }
-    $paymentintent['public_url']="";
+    $paymentintent['public_url']=getOnlinePaymentUrl(0, $type, $object->ref);
     $paymentintent['amount']=$amount;
     $paymentintent['currency']=$currency;
     
