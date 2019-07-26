@@ -616,7 +616,7 @@ $source=$src->id;
 }
 }
 
-if ($object=='orders') {
+if ($object == 'orders') {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut==0 && $order->billed!=1) {
@@ -658,7 +658,7 @@ $currency=$order->multicurrency_code;
 $total=price2num($order->total_ttc);
 $origin='order';
 }
-elseif ($object=='invoice') {
+elseif ($object == 'invoices') {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $paiement = $invoice->getSommePaiement();
@@ -717,7 +717,7 @@ $error++;
 
 } else {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$object,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
 
 }
