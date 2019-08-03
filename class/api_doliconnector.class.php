@@ -685,8 +685,8 @@ $description = "ORD=" . $ref . ".CUS=" . $id.".PM=stripe";
 			'dol_thirdparty_id' => "" . $id . "",
       'FULLTAG' => $description,
       'dol_thirdparty_name' => $this->company->name,
-			'dol_version'=>DOL_VERSION,
-			'dol_entity'=>$conf->entity,
+			'dol_version' => DOL_VERSION,
+			'dol_entity' => $conf->entity,
 			'ipaddress'=>(empty($_SERVER['REMOTE_ADDR'])?'':$_SERVER['REMOTE_ADDR'])
 		);
     
