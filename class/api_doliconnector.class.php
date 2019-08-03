@@ -616,7 +616,7 @@ $source=$src->id;
 }
 }
 
-if ($object == 'orders') {
+if (preg_match('/order/', $object)) {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut==0 && $order->billed!=1) {
@@ -658,7 +658,7 @@ $currency=$order->multicurrency_code;
 $total=price2num($order->total_ttc);
 $origin='order';
 }
-elseif ($object == 'invoices') {
+elseif (preg_match('/invoice/', $object)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $paiement = $invoice->getSommePaiement();
@@ -705,7 +705,7 @@ $src2 = \Stripe\Source::create(array(
 
 if ($src2->three_d_secure->authenticated==false && $src2->redirect->status=='succeeded') {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;
 
 } else {
@@ -717,7 +717,7 @@ $error++;
 
 } else {
 
-$charge=$stripe->createPaymentStripe($total,$currency,$origin,$item,$source,$stripecu,$stripeacc,$servicestatus);
+$charge=$stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
 
 }
@@ -729,7 +729,7 @@ $msg=$charge->message;
 $code=$charge->code;
 $error++;
 
-} elseif (isset($charge->id) && $charge->statut=='success' && $object=='order') {
+} elseif (isset($charge->id) && $charge->statut=='success' && preg_match('/order/', $object)) {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order,DolibarrApiAccess::$user);
 if ($idinv > 0)
@@ -799,7 +799,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	            $msg=$paiement->errors;
 	            $error++;
 	        }else{ 
-        if ($object=='order') {
+        if (preg_match('/order/', $object)) {
         $order->classifyBilled(DolibarrApiAccess::$user);
         }        
           }
