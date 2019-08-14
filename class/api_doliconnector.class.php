@@ -638,9 +638,7 @@ $stripe = new Stripe($this->db);
 $stripeacc = $stripe->getStripeAccount($service);
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
-$pos=strpos($source,'src_');
-
-if ($pos !== false) {
+if (preg_match('/src_/', $source)) {
 $src = \Stripe\Source::retrieve("$source",array("stripe_account" => $stripeacc));
 }
 else {
@@ -709,54 +707,10 @@ $origin='invoice';
 
 if ($item>0)
 {
-if ($src->object=='source' && $src->type=='card' && isset($src->card->three_d_secure) && (($src->card->three_d_secure=='required') OR ($src->card->three_d_secure=='recommended') OR ($src->card->three_d_secure=='optional' && !empty($conf->global->STRIPE_USE_3DSECURE)))) {
-
-		$arrayzerounitcurrency=array('BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF', 'VND', 'VUV', 'XAF', 'XOF', 'XPF');
-		if (! in_array($currency, $arrayzerounitcurrency)) $stripeamount=$stripeamount * 100;
-    
-$description = "ORD=" . $ref . ".CUS=" . $id.".PM=stripe";
-		$metadata = array(
-			'dol_id' => "" . $item . "",
-			'dol_type' => "" . $origin . "",
-			'dol_thirdparty_id' => "" . $id . "",
-      'FULLTAG' => $description,
-      'dol_thirdparty_name' => $this->company->name,
-			'dol_version' => DOL_VERSION,
-			'dol_entity' => $conf->entity,
-			'ipaddress'=>(empty($_SERVER['REMOTE_ADDR'])?'':$_SERVER['REMOTE_ADDR'])
-		);
-    
-$src2 = \Stripe\Source::create(array(
-  "amount" => price2num($stripeamount, 'MU'),
-  "currency" => "$currency",
-  "type" => "three_d_secure",
-  "three_d_secure" => array(
-    "card" => "$source",
-  ),
-  "metadata" => $metadata,
-  "redirect" => array(
-    "return_url" => "$url&ref=$ref&statut=pending"
-  ),
-),array("stripe_account" => $stripe->getStripeAccount($service)));
-
-if ($src2->three_d_secure->authenticated==false && $src2->redirect->status=='succeeded') {
-
-$charge=$stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
-$redirect_url=$url."&ref=$ref&statut=".$charge->statut;
-
-} else {
-
-$redirect_url=$src2->redirect->url;
-$error++;
-
-}
-
-} else {
 
 $charge=$stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 $redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
 
-}
 } 
 
 if (isset($charge->id) && $charge->statut=='error'){
@@ -765,7 +719,7 @@ $msg=$charge->message;
 $code=$charge->code;
 $error++;
 
-} elseif (isset($charge->id) && $charge->statut=='success' && preg_match('/order/', $object)) {
+} elseif (isset($charge->id) && $charge->statut == 'success' && preg_match('/order/', $object)) {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order,DolibarrApiAccess::$user);
 if ($idinv > 0)
