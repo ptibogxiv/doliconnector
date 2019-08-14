@@ -333,14 +333,15 @@ $customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicest
                                                                                                
 if ($customerstripe->id) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
-$listofpaymentmethods = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
+$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
+$listofpaymentmethods2 = $customerstripe->sources->data;
 }
 
 $list = array();
 
-if ( $listofpaymentmethods != null ) {
+if ( $listofpaymentmethods1 != null ) {
 
-foreach ( $listofpaymentmethods as $src ) {
+foreach ( $listofpaymentmethods1 as $src ) {
 
 $list[$src->id]['id'] = $src->id;
 $list[$src->id]['type'] = $src->type;
@@ -369,7 +370,42 @@ if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) {
 
 $list[$src->id]['default_source']= $default;
 
-} } else { $list=null; } 
+} }
+ 
+if ( $listofpaymentmethods2 != null ) {
+
+foreach ( $listofpaymentmethods2 as $src ) {
+
+$list[$src->id]['id'] = $src->id;
+$list[$src->id]['type'] = $src->type;
+
+$list[$src->id]['holder'] = $src->billing_details->name;
+
+if ( $src->type == 'card' ) {
+
+$list[$src->id]['brand'] = $src->card->brand;
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4; 
+$list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
+$list[$src->id]['country'] = $src->card->country;
+
+} elseif ( $src->type == 'sepa_debit' ) {
+
+$list[$src->id]['brand'] = 'sepa_debit';
+$list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
+$list[$src->id]['mandate_reference'] = $src->sepa_debit->mandate_reference;
+$list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
+$list[$src->id]['expiration'] =  null;
+$list[$src->id]['country'] = $src->sepa_debit->country;
+
+}
+
+if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
+
+$list[$src->id]['default_source']= $default;
+
+} }
+
+if ($listofpaymentmethods1 == null && $listofpaymentmethods2 == null) { $list=null; } 
 
 $card=1;
 
