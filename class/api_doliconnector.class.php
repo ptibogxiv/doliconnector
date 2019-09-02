@@ -758,15 +758,15 @@ $multicurrency_amounts=array();
 	    $paiement->datepaye     = $datepaye;
 	    $paiement->amounts      = $amounts;   // Array with all payments dispatching
 	    $paiement->multicurrency_amounts = $multicurrency_amounts;   // Array with all payments dispatching
-      $paiement->paiementid   = dol_getIdFromCode($this->db,$paiementcode,'c_paiement','code','id',1);
+      $paiement->paiementid   = dol_getIdFromCode($this->db, $paiementcode, 'c_paiement', 'code', 'id', 1);
 	    $paiement->num_paiement = $charge->message;
-	    $paiement->note         = '';
+	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
       $paiement->ext_payment_id   = $charge->id;
       $paiement->ext_payment_site = $service;
 }
       if (! $error)
 	    {
-	    $paiement_id=$paiement->create(DolibarrApiAccess::$user, 0);
+	    $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1);
   
 if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 			{
@@ -799,7 +799,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
-	        $paiement->addPaymentToBank(DolibarrApiAccess::$user, 'payment', $label, $conf->global->STRIPE_BANK_ACCOUNT_FOR_PAYMENTS, '', '');
+	        $result=$paiement->addPaymentToBank(DolibarrApiAccess::$user, 'payment', $label, $conf->global->STRIPE_BANK_ACCOUNT_FOR_PAYMENTS, '', '');
 	        if ($result < 0)
 	        {
 	            $msg=$paiement->errors;
