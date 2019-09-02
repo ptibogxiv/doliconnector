@@ -805,7 +805,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	            $msg=$paiement->errors;
 	            $error++;
 	        } 
-$invoice->set_paid(DolibarrApiAccess::$user);                    
+//$invoice->set_paid(DolibarrApiAccess::$user);                    
 	    }          
             return array(
             'charge' => $charge->id,
