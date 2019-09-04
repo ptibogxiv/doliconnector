@@ -748,7 +748,7 @@ $multicurrency_amounts=array();
 	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
       $paiement->ext_payment_id   = $charge->id;
       $paiement->ext_payment_site = $service;
-      $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1);
+      $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1, $this->company);
 }
 
 if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $object))
@@ -782,8 +782,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	            $msg=$paiement->errors;
 	            $error++;
 	        } 
-        $invoice->set_paid(DolibarrApiAccess::$user); 
-        if (preg_match('/order/', $object)) {
+        if (preg_match('/order/', $object) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
         $order->classifyBilled(DolibarrApiAccess::$user);
         }                     
 	    }          
