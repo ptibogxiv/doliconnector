@@ -606,12 +606,11 @@ return $result;
      * @param string  $object         Type of object to pay 
      * @param int   $item         Id of object to pay
      * @param string $source         Source {@from body}
-     * @param string $url         Return_url {@from body}
      * @return int  ID of subscription
      *
      * @url POST {id}/pay/{object}/{item}
      */
-    function paySource($id, $object, $item, $source, $url)
+    function paySource($id, $object, $item, $source)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
@@ -619,10 +618,10 @@ return $result;
       }
 
 $result = $this->company->fetch($id);
-// PDF
-$hidedetails = (GETPOST('hidedetails', 'int') ? GETPOST('hidedetails', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0));
-$hidedesc = (GETPOST('hidedesc', 'int') ? GETPOST('hidedesc', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0));
-$hideref = (GETPOST('hideref', 'int') ? GETPOST('hideref', 'int') : (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0));
+
+$hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
+$hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
+$hideref = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
  
 if (! empty($conf->stripe->enabled))
 {
@@ -653,22 +652,22 @@ $source=$src->id;
 if (preg_match('/order/', $object)) {
 $order=new Commande($this->db);
 $order->fetch($item);
-if ($order->statut==0 && $order->billed!=1) {
+if ($order->statut == 0 && $order->billed != 1) {
 $order->valid(DolibarrApiAccess::$user,0,0); // id warehouse to change !!!!!!       
 $order->fetch($item);
 }
-if ($order->statut==1&&$order->billed!=1) {
-if ($src->type=='card'){
-$order->mode_reglement_id='6';
+if ($order->statut == 1 && $order->billed != 1) {
+if ($src->type == 'card'){
+$order->mode_reglement_id = '6';
 }
 elseif ($src->type=='sepa_debit'){
-$order->mode_reglement_id='3';
+$order->mode_reglement_id = '3';
 }
-$order->update(DolibarrApiAccess::$user,1);
+$order->update(DolibarrApiAccess::$user, 1);
 }
 else {
-$idref=0;
-$msg="order already billed";
+$idref = 0;
+$msg = "order already billed";
 $error++;
 }
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
@@ -687,54 +686,40 @@ $error++;
 				$order->generateDocument($order->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 				}
         
-$ref=$order->ref;
-$currency=$order->multicurrency_code;
-$total=price2num($order->total_ttc);
-$origin='order';
+$ref = $order->ref;
+$currency = $order->multicurrency_code;
+$total = price2num($order->total_ttc);
+$origin = 'order';
 }
 elseif (preg_match('/invoice/', $object)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $paiement = $invoice->getSommePaiement();
-$creditnotes=$invoice->getSumCreditNotesUsed();
-$deposits=$invoice->getSumDepositsUsed();
-$ref=$invoice->ref;
-$ifverif=$invoice->socid;
-$currency=$invoice->multicurrency_code;
-$total=price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits,'MT');
-$origin='invoice';
+$creditnotes = $invoice->getSumCreditNotesUsed();
+$deposits = $invoice->getSumDepositsUsed();
+$ref = $invoice->ref;
+$currency = $invoice->multicurrency_code;
+$total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, 'MT');
+$origin = 'invoice';
 }
 
-if ($item>0)
+if ($item > 0)
 {
-
-$charge=$stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
-$redirect_url=$url."&ref=$ref&statut=".$charge->statut;	
-
+$charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 } 
 
-if (isset($charge->id) && $charge->statut=='error'){
-
+if (isset($charge->id) && $charge->statut == 'error') {
 $msg=$charge->message;
 $code=$charge->code;
 $error++;
-
-} elseif (isset($charge->id) && $charge->statut == 'success' && preg_match('/order/', $object)) {
+} elseif (preg_match('/order/', $object) && $order->billed != 1) {
 $invoice = new Facture($this->db);
-$idinv=$invoice->createFromOrder($order,DolibarrApiAccess::$user);
+$idinv=$invoice->createFromOrder($order, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-	// Change status to validated
-	$result=$invoice->validate(DolibarrApiAccess::$user);
+	$result=$invoice->validate(DolibarrApiAccess::$user);  
 	if ($result > 0) {
-$invoice->fetch($idinv);
-$paiement = $invoice->getSommePaiement();
-$creditnotes=$invoice->getSumCreditNotesUsed();
-$deposits=$invoice->getSumDepositsUsed();
-$ref=$invoice->ref;
-$ifverif=$invoice->socid;
-$currency=$invoice->multicurrency_code;
-$total=price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits,'MT');
+// no action if OK
 } else {
 $msg=$invoice->error; 
 $error++;
@@ -763,12 +748,10 @@ $multicurrency_amounts=array();
 	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
       $paiement->ext_payment_id   = $charge->id;
       $paiement->ext_payment_site = $service;
+      $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1);
 }
-      if (! $error)
-	    {
-	    $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1);
-  
-if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
+
+if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $object))
 			{
 				$outputlangs = $langs;
 				$newlang = '';
@@ -779,23 +762,17 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 					$outputlangs->setDefaultLang($newlang);
 				}
 				$model=$invoice->modelpdf;
-				$ret = $invoice->fetch($invoice->id); // Reload to get new records
+				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
 
 				$invoice->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
-
 			}         
 	    	if ($paiement_id < 0)
 	        {
 	            $msg=$paiement->errors;
 	            $error++;
-	        }else{ 
-        if (preg_match('/order/', $object)) {
-        $order->classifyBilled(DolibarrApiAccess::$user);
-        }        
-          }
-	    }
+	        }
       
-	    if (! $error && ! empty($conf->banque->enabled))
+	    if (! $error && $paiement_id > 0 && ! empty($conf->banque->enabled))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
@@ -805,12 +782,14 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && count($invoice->lines))
 	            $msg=$paiement->errors;
 	            $error++;
 	        } 
-//$invoice->set_paid(DolibarrApiAccess::$user);                    
+        $invoice->set_paid(DolibarrApiAccess::$user); 
+        if (preg_match('/order/', $object)) {
+        $order->classifyBilled(DolibarrApiAccess::$user);
+        }                     
 	    }          
             return array(
             'charge' => $charge->id,
             'statut' => $charge->statut,
-            'redirect_url' => $redirect_url,
             'code' => $code,
             'message' => $msg
         );
