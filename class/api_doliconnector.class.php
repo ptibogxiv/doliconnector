@@ -412,6 +412,9 @@ $card=1;
 if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( $this->company->isInEEC() ) ) {
 $sepa=1;
 }
+if (!empty($conf->global->STRIPE_PAYMENT_REQUEST_API)) {
+$pra=1;
+}
 }
  
 if ($conf->global->FACTURE_RIB_NUMBER){
@@ -444,7 +447,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'discount' => $amount_discount,
       'card' => $card,
       'sepa_direct_debit' => $sepa,
-      'payment_request_api' => $sepa,
+      'payment_request_api' => $pra,
       'RIB' => $rib,
       'CHQ' => $chq,
       'stripe' => $servicestatus,
