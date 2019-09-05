@@ -613,7 +613,7 @@ return $result;
      *
      * @url POST {id}/pay/{object}/{item}
      */
-    function paySource($id, $object, $item, $source)
+    function payObject($id, $object, $item, $source)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
@@ -643,7 +643,7 @@ $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 
 if (preg_match('/src_/', $source)) {
 $src = \Stripe\Source::retrieve("$source",array("stripe_account" => $stripeacc));
 }
-else {
+elseif (preg_match('/tok_/', $source)) {
 $src = \Stripe\Source::create(array(
   "type" => "card",
   "token" => $source
@@ -685,7 +685,7 @@ $error++;
 					$outputlangs->setDefaultLang($newlang);
 				}
 
-				$ret = $order->fetch($order->id); // Reload to get new records
+				$ret = $order->fetch($item); // Reload to get new records
 				$order->generateDocument($order->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 				}
         
@@ -706,7 +706,7 @@ $total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, '
 $origin = 'invoice';
 }
 
-if ($item > 0)
+if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source))
 {
 $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 } 
