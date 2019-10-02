@@ -135,7 +135,7 @@ print '</td></tr>';
 $var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_PASSWORD").'</td><td>';
-print '<input size="80" type="text" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
+print '<input size="80" type="password" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
