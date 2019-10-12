@@ -82,7 +82,7 @@ class Actionsdoliconnector
 				$this->resprints.= '<table width="100%" class="nobordernopadding"><tr><td>';
 				$this->resprints.= $form->textwithpicto($langs->trans('LinkedToWordpress'),$langs->trans("LinkedToWordpressDesc"),1);
 				$this->resprints.= '</td><td align="right">';
-				$this->resprints.= '<a href="'.$dolibarr_main_url_root.dol_buildpath('/doliconnector/card.php?socid='.$object->id, 1).'">'.img_edit().'</a>';
+				$this->resprints.= '<a class="editfielda" href="'.$dolibarr_main_url_root.dol_buildpath('/doliconnector/card.php?socid='.$object->id, 1).'">'.img_edit($langs->transnoentitiesnoconv('Edit'), 1).'</a>';
 				$this->resprints.= '</td></tr></table>';
 				$this->resprints.= '</td>';
 				$this->resprints.= '<td colspan="3">';
