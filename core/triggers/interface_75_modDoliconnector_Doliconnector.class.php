@@ -129,11 +129,16 @@ $ok=0;
 		$societeaccount = new SocieteAccount($db);
 		$wdpr = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
 
-    if ( $wdpr > 0 ) { 
-    //$result=$wordpress->doliconnectorSync("POST", '/users/'.$wdpr, json_encode($object));
-    //$input=json_decode($result);                 	 
-    $ok=$input->ok;
-	 } 
+if ( $wdpr > 0 ) {
+$wordpress=new Daodoliconnector($db);
+$data = [
+    'name'  => $object->name,
+    'email' => $object->email
+	];
+$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr.'/?context=edit', $data);
+$response=json_decode($result);
+$ok=$input->ok;
+}
   }
 
   } 
