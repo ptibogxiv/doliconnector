@@ -95,7 +95,7 @@ if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($this->db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
 $response=json_decode($result);
-$this->resprints.= $response->name.' ('.$response->slug.')';
+$this->resprints.= $response->name.' ('.$response->slug.'), '.$response->email;
 
 } else {
 $this->resprints.= $langs->trans("NoSync");
