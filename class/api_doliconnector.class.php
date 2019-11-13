@@ -334,7 +334,8 @@ $customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicest
 if ($customerstripe->id) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
 $listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
-$listofpaymentmethods2 = $customerstripe->sources->data;
+$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
+$listofpaymentmethods3 = $customerstripe->sources->data;
 }
 
 $list = array();
@@ -348,14 +349,25 @@ $list[$src->id]['type'] = $src->type;
 
 $list[$src->id]['holder'] = $src->billing_details->name;
 
-if ( $src->type == 'card' ) {
-
 $list[$src->id]['brand'] = $src->card->brand;
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4; 
 $list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
 $list[$src->id]['country'] = $src->card->country;
 
-} elseif ( $src->type == 'sepa_debit' ) {
+if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
+
+$list[$src->id]['default_source']= $default;
+
+} }
+
+if ( $listofpaymentmethods2 != null ) {
+
+foreach ( $listofpaymentmethods2 as $src ) {
+
+$list[$src->id]['id'] = $src->id;
+$list[$src->id]['type'] = $src->type;
+
+$list[$src->id]['holder'] = $src->billing_details->name;
 
 $list[$src->id]['brand'] = 'sepa_debit';
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
@@ -364,17 +376,15 @@ $list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
 $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = $src->sepa_debit->country;
 
-}
-
 if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
 
 } }
  
-if ( $listofpaymentmethods2 != null ) {
+if ( $listofpaymentmethods3 != null ) {
 
-foreach ( $listofpaymentmethods2 as $src ) {
+foreach ( $listofpaymentmethods3 as $src ) {
 
 $list[$src->id]['id'] = $src->id;
 $list[$src->id]['type'] = $src->type;
