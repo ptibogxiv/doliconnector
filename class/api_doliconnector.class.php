@@ -294,10 +294,12 @@ if ($type == 'order')
      * @param 	int 	$id ID of thirdparty
      *
      * @url	GET {id}/paymentmethods
+     * @param     string  $type Type of object (order, invoice...)
+     * @param     int     $rowid ID of object
      *
      * @return int
      */
-    function getListPaymentMethods($id)
+    function getListPaymentMethods($id, $type = null, $rowid = null)
     {
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
@@ -312,6 +314,8 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
       }
       
 $amount_discount=$this->company->getAvailableDiscounts();
+
+$list = array();
 
 if (! empty($conf->stripe->enabled)) {
 	$service = 'StripeTest';
@@ -336,6 +340,10 @@ if ($customerstripe->id) {
 $listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
 $listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
 $listofpaymentmethods3 = $customerstripe->sources->data;
+}
+
+if ( empty($type) && empty($rowid) ) {
+$stripeSetupIntent = \Stripe\SetupIntent::create();
 }
 
 $list = array();
@@ -454,6 +462,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'com_countrycode' => getCountry($mysoc->country_code,2),
       'cus_countrycode' => $this->company->country_code,
 			'paymentmethods' => $list,
+      'stripe_setupintent' => $stripeSetupIntent->client_secret,
       'discount' => $amount_discount,
       'card' => $card,
       'sepa_direct_debit' => $sepa,
