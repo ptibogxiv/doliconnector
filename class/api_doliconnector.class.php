@@ -343,7 +343,9 @@ $listofpaymentmethods3 = $customerstripe->sources->data;
 }
 
 if ( empty($type) && empty($rowid) ) {
-$stripeSetupIntent = \Stripe\SetupIntent::create();
+$stripeSetupIntent = \Stripe\SetupIntent::create([
+  'payment_method_types' => array('card', 'sepa_debit'),
+]);
 }
 
 $list = array();
