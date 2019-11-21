@@ -461,6 +461,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'secure_key' => $conf->global->PAYMENT_SECURITY_TOKEN,
       'code_account' => $stripeacc,
       'code_client' => $customerstripe->id,
+      'com_countrycode' => getCountry($mysoc->country_code,2),
       'cus_countrycode' => $this->company->country_code,
       'cus_email' => $this->company->email,
 			'paymentmethods' => $list,
