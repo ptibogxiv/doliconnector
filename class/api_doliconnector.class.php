@@ -460,6 +460,7 @@ $paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
       'publishable_key' => $publishable_key,
       'secure_key' => $conf->global->PAYMENT_SECURITY_TOKEN,
       'code_account' => $stripeacc,
+      'code_client' => $customerstripe->id,
       'cus_countrycode' => $this->company->country_code,
       'cus_email' => $this->company->email,
 			'paymentmethods' => $list,
