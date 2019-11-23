@@ -506,7 +506,7 @@ return $payment_method;
       if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id)) {
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
-         
+      
 if (! empty($conf->stripe->enabled))
 {
 	$service = 'StripeTest';
@@ -585,7 +585,6 @@ $result = $customerstripe->save();
   
 return $result;
     }
-    
 
       /**
      * Pay an object
