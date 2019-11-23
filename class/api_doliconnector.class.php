@@ -317,6 +317,11 @@ $amount_discount=$this->company->getAvailableDiscounts();
 
 $list = array();
 
+$infothirdparty =array(
+						"email" => $this->company->email,
+						"countrycode" => $this->company->country_code
+            );
+
 if (! empty($conf->stripe->enabled)) {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -334,6 +339,12 @@ if (! empty($conf->stripe->enabled)) {
 $stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
 $customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+
+$infostripe = array();
+$infostripe['live'] = $servicestatus;
+$infostripe['publishable_key'] = $publishable_key;
+$infostripe['account'] = $stripeacc;
+$infostripe['types'] = array("card");
                                                                                                
 if ($customerstripe->id) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
@@ -343,10 +354,15 @@ $listofpaymentmethods3 = $customerstripe->sources->data;
 }
 
 if ( empty($type) && empty($rowid) ) {
-$stripeSetupIntent = \Stripe\SetupIntent::create([
-  'payment_method_types' => array('card', 'sepa_debit'),
-]);
-}
+//$stripeSetupIntent = \Stripe\SetupIntent::create([
+//  'payment_method_types' => array('card', 'sepa_debit'),
+//]);
+$stripeClientSecret = $stripe->getSetupIntent(null, null, $customerstripe->id, $stripeacc, $servicestatus, false);
+} else {
+
+}  
+
+$infostripe['client_secret'] = $stripeClientSecret->client_secret;
 
 $list = array();
 
@@ -427,14 +443,16 @@ $list[$src->id]['default_source']= $default;
 
 if ($listofpaymentmethods1 == null && $listofpaymentmethods2 == null) { $list=null; } 
 
-$card=1;
-
-if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ( $this->company->isInEEC() ) ) {
-$sepa=1;
-}
 if (!empty($conf->global->STRIPE_PAYMENT_REQUEST_API)) {
-$pra=1;
+$infostripe['types'][] .= "payment_request_api";
 }
+if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ($this->company->isInEEC())) {
+$infostripe['types'][] .= "sepa_debit";
+}
+if (!empty($conf->global->STRIPE_IDEAL) && $this->company->country_code == 'NL') {
+$infostripe['types'][] .= "ideal";
+}
+
 }
  
 if ($conf->global->FACTURE_RIB_NUMBER){
@@ -453,27 +471,19 @@ $chq=array('proprio' => $bank->proprio,'owner_address' => $bank->owner_address);
 }
 
 if (! empty($conf->paypal->enabled)) {
-$paypalurl=$conf->global->MAIN_MODULE_PAYPAL;
+$infopaypal = array();
+$infopaypal['live'] = null;
+$infopaypal['url'] = null;
 }
   
   		return array(
-      'publishable_key' => $publishable_key,
-      'secure_key' => $conf->global->PAYMENT_SECURITY_TOKEN,
-      'code_account' => $stripeacc,
-      'code_client' => $customerstripe->id,
-      'com_countrycode' => getCountry($mysoc->country_code,2),
-      'cus_countrycode' => $this->company->country_code,
-      'cus_email' => $this->company->email,
-			'paymentmethods' => $list,
-      'stripe_client_secret' => $stripeSetupIntent->client_secret,
+      'thirdparty' => $infothirdparty,
+			'payment_methods' => $list,
       'discount' => $amount_discount,
-      'card' => $card,
-      'sepa_direct_debit' => $sepa,
-      'payment_request_api' => $pra,
       'RIB' => $rib,
       'CHQ' => $chq,
-      'stripe' => $servicestatus,
-      'paypal' => $paypalurl
+      'stripe' => $infostripe,
+      'paypal' => $infopaypal
 		);
     } 
     
