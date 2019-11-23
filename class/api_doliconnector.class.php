@@ -436,7 +436,7 @@ $public_url = getOnlinePaymentUrl(0, $type, $object->ref);
       'CHQ' => $chq,
       'stripe' => $infostripe,
       'paypal' => $infopaypal,
-      'public_url' => $public_url,
+      'public_url' => $public_url
 		);
     } 
     
