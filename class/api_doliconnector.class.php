@@ -207,6 +207,10 @@ $trainee = $this->db->fetch_object($result);
     function getConstante($id)
     {
         global $conf;
+        
+      if(!DolibarrApiAccess::$user->admin) {
+        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+      }  
         return array("value" => $conf->global->$id);
     } 
     
