@@ -475,7 +475,10 @@ $infopaypal = array();
 $infopaypal['live'] = null;
 $infopaypal['url'] = null;
 }
-  
+
+if (!empty($type) && is_object($object)  && isset($object->ref)) {
+$public_url = getOnlinePaymentUrl(0, $type, $object->ref);
+}  
   		return array(
       'thirdparty' => $infothirdparty,
 			'payment_methods' => $list,
@@ -483,7 +486,8 @@ $infopaypal['url'] = null;
       'RIB' => $rib,
       'CHQ' => $chq,
       'stripe' => $infostripe,
-      'paypal' => $infopaypal
+      'paypal' => $infopaypal,
+      'public_url' => $public_url,
 		);
     } 
     
