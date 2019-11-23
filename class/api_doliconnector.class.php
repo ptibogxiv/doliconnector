@@ -358,8 +358,31 @@ if ( empty($type) && empty($rowid) ) {
 //  'payment_method_types' => array('card', 'sepa_debit'),
 //]);
 $stripeClientSecret = $stripe->getSetupIntent(null, null, $customerstripe->id, $stripeacc, $servicestatus, false);
-} else {
+} elseif (!empty($type)) {
+if ($type == 'order')
+{
+	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
+	$order=new Commande($this->db);
+	$result=$order->fetch($rowid);
+	if ($result <= 0)
+	{
+		$mesg=$order->error;
+		$error++;
+	}
+	else
+	{
+		$result=$order->fetch_thirdparty($order->socid);
+	}
+	$object = $order;
 
+	$amount=$object->total_ttc;
+	$amount=price2num($amount);
+  $currency=$object->multicurrency_code;
+	$fulltag='ORD='.$object->id.'.CUS='.$object->thirdparty->id;
+	$tag=null;
+	$fulltag=dol_string_unaccent($fulltag);  
+} 
+$stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
 }  
 
 $infostripe['client_secret'] = $stripeClientSecret->client_secret;
