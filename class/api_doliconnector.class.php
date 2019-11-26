@@ -386,20 +386,20 @@ $list[$src->id]['country'] = $src->sepa_debit->country;
 
 if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
-$list[$src->id]['default_source']= $default;
+$list[$src->id]['default_source'] = $default;
 
 } }
 
 if ($listofpaymentmethods1 == null && $listofpaymentmethods2 == null) { $list=null; } 
 
 if (!empty($conf->global->STRIPE_PAYMENT_REQUEST_API)) {
-$infostripe['types'][] .= "payment_request_api";
+$infostripe['types'][] = "payment_request_api";
 }
 if (!empty($conf->global->STRIPE_SEPA_DIRECT_DEBIT) && ($this->company->isInEEC())) {
-$infostripe['types'][] .= "sepa_debit";
+$infostripe['types'][] = "sepa_debit";
 }
 if (!empty($conf->global->STRIPE_IDEAL) && $this->company->country_code == 'NL') {
-$infostripe['types'][] .= "ideal";
+$infostripe['types'][] = "ideal";
 }
 
 }
