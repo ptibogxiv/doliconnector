@@ -264,6 +264,7 @@ if (! empty($conf->stripe->enabled)) {
   
 $stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
+$stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 $customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
 
 $infostripe = array();
