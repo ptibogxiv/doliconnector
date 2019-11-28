@@ -308,8 +308,12 @@ if ($type == 'order')
 	$fulltag='ORD='.$object->id.'.CUS='.$object->thirdparty->id;
 	$tag=null;
 	$fulltag=dol_string_unaccent($fulltag);  
-} 
+}
+if ($object->id > 0) {  
 $stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
+} else {
+          throw new RestException(404, 'Object '.$type.' id='.$rowid.' not found');
+}
 }  
 
 $infostripe['client_secret'] = $stripeClientSecret->client_secret;
