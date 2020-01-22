@@ -715,9 +715,9 @@ if (preg_match('/pi_/', $source)) {
 			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
 		}
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$src = \Stripe\PaymentMethod::retrieve("$pintent->payment_method");
+    	$src = \Stripe\PaymentMethod::retrieve($charge->payment_method);
 		} else {
-			$src = \Stripe\PaymentMethod::retrieve("$pintent->payment_method", array("stripe_account" => $stripeacc));
+			$src = \Stripe\PaymentMethod::retrieve($charge->payment_method, array("stripe_account" => $stripeacc));
 		}
 } elseif (preg_match('/pm_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
