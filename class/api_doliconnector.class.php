@@ -710,14 +710,14 @@ $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 
 
 if (preg_match('/pi_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$charge = \Stripe\PaymentIntent::retrieve("$source");
+    	$pi = \Stripe\PaymentIntent::retrieve("$source");
 		} else {
-			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+			$pi = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
 		}
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$src = \Stripe\PaymentMethod::retrieve($charge->payment_method);
+    	$src = \Stripe\PaymentMethod::retrieve($pi->payment_method);
 		} else {
-			$src = \Stripe\PaymentMethod::retrieve($charge->payment_method, array("stripe_account" => $stripeacc));
+			$src = \Stripe\PaymentMethod::retrieve($pi->payment_method, array("stripe_account" => $stripeacc));
 		}
 } elseif (preg_match('/pm_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
@@ -794,9 +794,13 @@ $origin = 'invoice';
 }
 
 if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source)) {
-$charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
+      $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
 } elseif ($item > 0 && preg_match('/pi_/', $source)) {
-
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$charge = \Stripe\PaymentIntent::retrieve("$source");
+		} else {
+			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+		}
 }
 
 if (isset($charge->id) && $charge->statut == 'error') {
@@ -878,7 +882,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	    }          
             return array(
             'charge' => $charge->id,
-            'statut' => $charge->statut,
+            'status' => $charge->status,
             'code' => $code,
             'message' => $msg
         );
