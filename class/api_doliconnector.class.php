@@ -598,6 +598,76 @@ $result = $customerstripe->save();
   
 return $result;
     }
+    
+     /**
+     * Detach payment method to a thirdparty
+     *
+     * @param int		$id	Id of thirdparty
+     * @param string		$method	Id of payment method
+     *
+     * @return mixed
+     * @throws 401
+     * 
+     * @url DELETE {id}/paymentmethods/{method}
+     */
+    function deletePaymentMethod($id, $method) {
+    global $conf;
+  
+    $result = $this->company->fetch($id);
+      if( ! $result ) {
+          throw new RestException(404, 'Thirdparty not found');
+      }
+      
+      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id)) {
+        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+      }
+         
+if (! empty($conf->stripe->enabled))
+{
+	$service = 'StripeTest';
+	$servicestatus = 0;
+	if (! empty($conf->global->STRIPE_LIVE))
+	{
+		$service = 'StripeLive';
+		$servicestatus = 1;
+	}
+
+	$stripe = new Stripe($this->db);
+	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
+}
+
+				if (preg_match('/pm_/', $method))
+				{
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$payment_method = \Stripe\PaymentMethod::retrieve($method);
+		} else {
+			$payment_method = \Stripe\PaymentMethod::retrieve($method, array("stripe_account" => $stripeacc));
+		}
+      if ($payment_method)
+			{
+			$payment_method->detach();
+			}
+        }
+        else
+				{
+				$cu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+				$card=$cu->sources->retrieve("$method");
+				if ($card)
+				{
+					// $card->detach();  Does not work with card_, only with src_
+					if (method_exists($card, 'detach')) $card->detach();
+					else $card->delete();
+				}
+        }
+                                                                       
+        return array(
+            'success' => array(
+                'code' => 200,
+                'message' => 'Payment method deleted'
+            )
+        );
+    
+    }
 
       /**
      * Pay an object
@@ -640,9 +710,9 @@ $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 
 
 if (preg_match('/pi_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$pintent = \Stripe\PaymentIntent::retrieve("$source");
+    	$charge = \Stripe\PaymentIntent::retrieve("$source");
 		} else {
-			$pintent = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
 		}
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$src = \Stripe\PaymentMethod::retrieve("$pintent->payment_method");
@@ -723,10 +793,11 @@ $total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, '
 $origin = 'invoice';
 }
 
-if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source))
-{
+if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source)) {
 $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
-} 
+} elseif ($item > 0 && preg_match('/pi_/', $source)) {
+
+}
 
 if (isset($charge->id) && $charge->statut == 'error') {
 $msg=$charge->message;
@@ -812,71 +883,5 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
             'message' => $msg
         );
     } 
-
-     /**
-     * Detach payment method to a thirdparty
-     *
-     * @param int		$id	Id of thirdparty
-     * @param string		$method	Id of payment method
-     *
-     * @return mixed
-     * @throws 401
-     * 
-     * @url DELETE {id}/paymentmethods/{method}
-     */
-    function deletePaymentMethod($id, $method) {
-    global $conf;
-  
-    $result = $this->company->fetch($id);
-      if( ! $result ) {
-          throw new RestException(404, 'Thirdparty not found');
-      }
-      
-      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id)) {
-        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-      }
-         
-if (! empty($conf->stripe->enabled))
-{
-	$service = 'StripeTest';
-	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
-	{
-		$service = 'StripeLive';
-		$servicestatus = 1;
-	}
-
-	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);								// Get Stripe OAuth connect account (no network access here)
-}
-
-				if (preg_match('/pm_/', $method))
-				{
-            $payment_method = \Stripe\PaymentMethod::retrieve($method, ["stripe_account" => $stripeacc]);
-            if ($payment_method)
-				    {
-					  $payment_method->detach();
-				    }
-        }
-        else
-				{
-				$cu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-				$card=$cu->sources->retrieve("$method");
-				if ($card)
-				{
-					// $card->detach();  Does not work with card_, only with src_
-					if (method_exists($card, 'detach')) $card->detach();
-					else $card->delete();
-				}
-        }
-                                                                       
-        return array(
-            'success' => array(
-                'code' => 200,
-                'message' => 'Payment method deleted'
-            )
-        );
-    
-    }
     
     } 
