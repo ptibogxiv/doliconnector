@@ -275,8 +275,16 @@ $infostripe['types'] = array("card");
                                                                                                
 if ($customerstripe->id) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
-$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
-$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"));
+		} else {
+			$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
+		}
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"));
+		} else {
+			$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
+		}
 $listofpaymentmethods3 = $customerstripe->sources->data;
 }
 
@@ -630,10 +638,19 @@ if (! empty($conf->stripe->enabled))
 
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
-if (preg_match('/src_/', $source)) {
-$src = \Stripe\Source::retrieve("$source",array("stripe_account" => $stripeacc));
-}
-elseif (preg_match('/tok_/', $source)) {
+if (preg_match('/pi_/', $source)) {
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$src = \Stripe\PaymentIntent::retrieve("$source");
+		} else {
+			$src = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+		}
+} elseif (preg_match('/src_/', $source)) {
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$src = \Stripe\Source::retrieve("$source");
+		} else {
+			$src = \Stripe\Source::retrieve("$source", array("stripe_account" => $stripeacc));
+		}
+} elseif (preg_match('/tok_/', $source)) {
 $src = \Stripe\Source::create(array(
   "type" => "card",
   "token" => $source
