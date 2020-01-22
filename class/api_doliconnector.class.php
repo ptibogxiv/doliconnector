@@ -640,9 +640,20 @@ $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 
 
 if (preg_match('/pi_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$src = \Stripe\PaymentIntent::retrieve("$source");
+    	$pintent = \Stripe\PaymentIntent::retrieve("$source");
 		} else {
-			$src = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+			$pintent = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+		}
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$src = \Stripe\PaymentMethod::retrieve("$pintent->payment_method");
+		} else {
+			$src = \Stripe\PaymentMethod::retrieve("$pintent->payment_method", array("stripe_account" => $stripeacc));
+		}
+} elseif (preg_match('/pm_/', $source)) {
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$src = \Stripe\PaymentMethod::retrieve("$source");
+		} else {
+			$src = \Stripe\PaymentMethod::retrieve("$source", array("stripe_account" => $stripeacc));
 		}
 } elseif (preg_match('/src_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
