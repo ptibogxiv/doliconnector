@@ -801,6 +801,12 @@ if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source))
 		} else {
 			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
 		}
+} elseif ($item > 0 && preg_match('/pm_/', $source)) {
+		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
+    	$charge = \Stripe\PaymentMethod::retrieve("$source");
+		} else {
+			$charge = \Stripe\PaymentMethod::retrieve("$source", array("stripe_account" => $stripeacc));
+		}
 }
 
 if (isset($charge->id) && $charge->statut == 'error') {
