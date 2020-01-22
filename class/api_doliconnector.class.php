@@ -471,7 +471,7 @@ if (! empty($conf->stripe->enabled))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
+	if (! empty($conf->global->STRIPE_LIVE))
 	{
 		$service = 'StripeLive';
 		$servicestatus = 1;
@@ -516,7 +516,7 @@ if (! empty($conf->stripe->enabled))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
+	if (! empty($conf->global->STRIPE_LIVE))
 	{
 		$service = 'StripeLive';
 		$servicestatus = 1;
@@ -572,7 +572,7 @@ if (! empty($conf->stripe->enabled))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
-	if (! empty($conf->global->STRIPE_LIVE) && ! GETPOST('forcesandbox','alpha'))
+	if (! empty($conf->global->STRIPE_LIVE))
 	{
 		$service = 'StripeLive';
 		$servicestatus = 1;
@@ -625,8 +625,9 @@ if (! empty($conf->stripe->enabled))
 		$servicestatus = 1;
 	}
 
-$stripe = new Stripe($this->db); 
-$stripeacc = $stripe->getStripeAccount($service);
+	$stripe = new Stripe($this->db);
+	$stripeacc = $stripe->getStripeAccount($service);
+
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
 if (preg_match('/src_/', $source)) {
