@@ -420,15 +420,15 @@ $infostripe['types'][] = "ideal";
 if ($conf->global->FACTURE_RIB_NUMBER){
 $bank = new Account($this->db);
 $bank->fetch($conf->global->FACTURE_RIB_NUMBER);
-$rib=array('IBAN' => $bank->iban,'BIC' => $bank->bic);
+$vir=array('bank' => $bank->iban, 'IBAN' => $bank->iban, 'BIC' => $bank->bic);
 }
 if ($conf->global->FACTURE_CHQ_NUMBER){
 if ($conf->global->FACTURE_CHQ_NUMBER=='-1'){
-$chq=array('proprio' => $bank->proprio,'owner_address' => $bank->owner_address);
+$chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address);
 } else {
 $bank = new Account($this->db);
 $bank->fetch($conf->global->FACTURE_CHQ_NUMBER);
-$chq=array('proprio' => $bank->proprio,'owner_address' => $bank->owner_address);
+$chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address);
 }
 }
 
@@ -445,7 +445,7 @@ $public_url = getOnlinePaymentUrl(0, $type, $object->ref);
       'thirdparty' => $infothirdparty,
 			'payment_methods' => $list,
       'discount' => $amount_discount,
-      'RIB' => $rib,
+      'VIR' => $vir,
       'CHQ' => $chq,
       'stripe' => $infostripe,
       'paypal' => $infopaypal,
@@ -672,22 +672,21 @@ if (! empty($conf->stripe->enabled))
       /**
      * Pay an object
      *
-     * @param int $id               ID of thirdparty
      * @param string  $object         Type of object to pay 
      * @param int   $item         Id of object to pay
      * @param string $source         Source {@from body}
      * @return int  ID of subscription
      *
-     * @url POST {id}/pay/{object}/{item}
+     * @url POST pay/{object}/{item}
      */
-    function payObject($id, $object, $item, $source)
+    function payObject($object, $item, $source)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
         throw new RestException(401);
       }
 
-$result = $this->company->fetch($id);
+//$result = $this->company->fetch($id);
 
 $hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
 $hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
