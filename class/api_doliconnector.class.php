@@ -755,7 +755,7 @@ $order->mode_reglement_id = '6';
 elseif ($src->type == 'sepa_debit'){
 $order->mode_reglement_id = '3';
 } else {
-$order->mode_reglement_id = $paymentmethod;
+$order->mode_reglement_id = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
 }
 $order->update(DolibarrApiAccess::$user, 1);
 }
