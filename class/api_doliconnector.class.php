@@ -739,6 +739,16 @@ $src = \Stripe\Source::create(array(
 ),array("stripe_account" => $stripeacc));
 $paymentmethod=$src->id;
 }
+} 
+
+if ($src->type == 'card') {
+$paymentid = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
+} elseif ($src->type == 'sepa_debit') {
+$paymentid = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
+} elseif ($src->type == 'ideal') {
+$paymentid = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
+} else {
+$paymentid = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
 }
 
 if (preg_match('/order/', $object)) {
@@ -749,15 +759,7 @@ $order->valid(DolibarrApiAccess::$user,0,0); // id warehouse to change !!!!!!
 $order->fetch($item);
 }
 if ($order->statut == 1 && $order->billed != 1) {
-if ($src->type == 'card') {
-$order->mode_reglement_id = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
-} elseif ($src->type == 'sepa_debit') {
-$order->mode_reglement_id = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
-} elseif ($src->type == 'ideal') {
-$order->mode_reglement_id = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
-} else {
-$order->mode_reglement_id = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
-}
+$order->mode_reglement_id = $paymentid; 
 $order->update(DolibarrApiAccess::$user, 1);
 }
 else {
@@ -788,6 +790,8 @@ $origin = 'order';
 elseif (preg_match('/invoice/', $object)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
+$invoice->mode_reglement_id = $paymentid; 
+$invoice->update(DolibarrApiAccess::$user, 1);
 $paiement = $invoice->getSommePaiement();
 $creditnotes = $invoice->getSumCreditNotesUsed();
 $deposits = $invoice->getSumDepositsUsed();
@@ -843,7 +847,6 @@ $error++;
       if (!$error)
       {           
 $datepaye = dol_now();
-$paiementcode ="CB"; 
 $amounts=array(); 
 $amounts[$invoice->id] = $total;
 $multicurrency_amounts=array();
@@ -853,7 +856,7 @@ $multicurrency_amounts=array();
 	    $paiement->datepaye     = $datepaye;
 	    $paiement->amounts      = $amounts;   // Array with all payments dispatching
 	    $paiement->multicurrency_amounts = $multicurrency_amounts;   // Array with all payments dispatching
-      $paiement->paiementid   = dol_getIdFromCode($this->db, $paiementcode, 'c_paiement', 'code', 'id', 1);
+      $paiement->paiementid   = $paymentid;
 	    $paiement->num_payment = $charge->message;
 	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
       $paiement->ext_payment_id   = $charge->id;
