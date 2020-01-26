@@ -752,8 +752,10 @@ if ($order->statut == 1 && $order->billed != 1) {
 if ($src->type == 'card'){
 $order->mode_reglement_id = '6';
 }
-elseif ($src->type=='sepa_debit'){
+elseif ($src->type == 'sepa_debit'){
 $order->mode_reglement_id = '3';
+} else {
+$order->mode_reglement_id = $paymentmethod;
 }
 $order->update(DolibarrApiAccess::$user, 1);
 }
@@ -794,7 +796,7 @@ $total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, '
 $origin = 'invoice';
 }
 
-if ($item > 0 && !preg_match('/pi_/', $paymentmethod) && !preg_match('/pm_/', $paymentmethod)) {
+if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
       $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
 } elseif ($item > 0 && preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
@@ -808,13 +810,18 @@ if ($item > 0 && !preg_match('/pi_/', $paymentmethod) && !preg_match('/pm_/', $p
 		} else {
 			$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
+} else {
+$msg='pending';
+$code='offline payment';
+$status='pending';
+$error++;
 }
 
-if (isset($charge->id) && $charge->statut == 'error') {
+if ($error || (isset($charge->id) && $charge->statut == 'error')) {
 $msg=$charge->message;
 $code=$charge->code;
 $error++;
-} elseif (preg_match('/order/', $object) && $order->billed != 1) {
+} elseif (!$error && preg_match('/order/', $object) && $order->billed != 1) {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order, DolibarrApiAccess::$user);
 if ($idinv > 0)
