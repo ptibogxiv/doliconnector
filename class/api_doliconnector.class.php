@@ -749,11 +749,12 @@ $order->valid(DolibarrApiAccess::$user,0,0); // id warehouse to change !!!!!!
 $order->fetch($item);
 }
 if ($order->statut == 1 && $order->billed != 1) {
-if ($src->type == 'card'){
-$order->mode_reglement_id = '6';
-}
-elseif ($src->type == 'sepa_debit'){
-$order->mode_reglement_id = '3';
+if ($src->type == 'card') {
+$order->mode_reglement_id = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
+} elseif ($src->type == 'sepa_debit') {
+$order->mode_reglement_id = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
+} elseif ($src->type == 'ideal') {
+$order->mode_reglement_id = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
 } else {
 $order->mode_reglement_id = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
 }
