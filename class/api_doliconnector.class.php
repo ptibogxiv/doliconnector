@@ -674,12 +674,14 @@ if (! empty($conf->stripe->enabled))
      *
      * @param string  $object         Type of object to pay 
      * @param int   $item         Id of object to pay
-     * @param string $source         Source {@from body}
+     * @param string $paymentintent         Force payment intent {@from body}
+     * @param string $paymentmethod         Payment method {@from body}
+     * @param int $save         Save payment method {@from body}
      * @return int  ID of subscription
      *
      * @url POST pay/{object}/{item}
      */
-    function payObject($object, $item, $source)
+    function payObject($object, $item, $paymentmethod, $paymentintent = null, $save = null)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
