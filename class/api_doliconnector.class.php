@@ -711,33 +711,33 @@ $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 
 
 if (preg_match('/pi_/', $source)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$pi = \Stripe\PaymentIntent::retrieve("$source");
+    	$pi = \Stripe\PaymentIntent::retrieve("$paymentmethod");
 		} else {
-			$pi = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+			$pi = \Stripe\PaymentIntent::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$src = \Stripe\PaymentMethod::retrieve($pi->payment_method);
 		} else {
 			$src = \Stripe\PaymentMethod::retrieve($pi->payment_method, array("stripe_account" => $stripeacc));
 		}
-} elseif (preg_match('/pm_/', $source)) {
+} elseif (preg_match('/pm_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$src = \Stripe\PaymentMethod::retrieve("$source");
+    	$src = \Stripe\PaymentMethod::retrieve("$paymentmethod");
 		} else {
-			$src = \Stripe\PaymentMethod::retrieve("$source", array("stripe_account" => $stripeacc));
+			$src = \Stripe\PaymentMethod::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
-} elseif (preg_match('/src_/', $source)) {
+} elseif (preg_match('/src_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$src = \Stripe\Source::retrieve("$source");
+    	$src = \Stripe\Source::retrieve("$paymentmethod");
 		} else {
-			$src = \Stripe\Source::retrieve("$source", array("stripe_account" => $stripeacc));
+			$src = \Stripe\Source::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
-} elseif (preg_match('/tok_/', $source)) {
+} elseif (preg_match('/tok_/', $paymentmethod)) {
 $src = \Stripe\Source::create(array(
   "type" => "card",
-  "token" => $source
+  "token" => $paymentmethod
 ),array("stripe_account" => $stripeacc));
-$source=$src->id;
+$paymentmethod=$src->id;
 }
 }
 
@@ -794,19 +794,19 @@ $total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, '
 $origin = 'invoice';
 }
 
-if ($item > 0 && !preg_match('/pi_/', $source) && !preg_match('/pm_/', $source)) {
-      $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $source, $stripecu, $stripeacc, $servicestatus);
-} elseif ($item > 0 && preg_match('/pi_/', $source)) {
+if ($item > 0 && !preg_match('/pi_/', $paymentmethod) && !preg_match('/pm_/', $paymentmethod)) {
+      $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
+} elseif ($item > 0 && preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$charge = \Stripe\PaymentIntent::retrieve("$source");
+    	$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod");
 		} else {
-			$charge = \Stripe\PaymentIntent::retrieve("$source", array("stripe_account" => $stripeacc));
+			$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
-} elseif ($item > 0 && preg_match('/pm_/', $source)) {
+} elseif ($item > 0 && preg_match('/pm_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$charge = \Stripe\PaymentMethod::retrieve("$source");
+    	$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod");
 		} else {
-			$charge = \Stripe\PaymentMethod::retrieve("$source", array("stripe_account" => $stripeacc));
+			$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
 }
 
