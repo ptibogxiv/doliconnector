@@ -709,7 +709,7 @@ if (! empty($conf->stripe->enabled))
 
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
 
-if (preg_match('/pi_/', $source)) {
+if (preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$pi = \Stripe\PaymentIntent::retrieve("$paymentmethod");
 		} else {
@@ -803,18 +803,21 @@ $origin = 'invoice';
 
 if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
       $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
+      $paiementid = $charge->id;
 } elseif ($item > 0 && preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod");
 		} else {
 			$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
+      $paiementid = $paymentmethod;
 } elseif ($item > 0 && preg_match('/pm_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod");
 		} else {
 			$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
+      $paiementid = $paymentintent;
 } else {
 $msg='pending';
 $code='offline payment';
@@ -859,7 +862,7 @@ $multicurrency_amounts=array();
       $paiement->paiementid   = $paymentid;
 	    $paiement->num_payment = $charge->message;
 	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
-      $paiement->ext_payment_id   = $charge->id;
+      $paiement->ext_payment_id   = $paiementid;
       $paiement->ext_payment_site = $service;
       $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1, $this->company);
 }
