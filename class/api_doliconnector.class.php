@@ -817,7 +817,7 @@ if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $
 		} else {
 			$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
-      $paiementid = $paymentintent;
+      $paiementid = $paymentmethod;
 } else {
 $msg='pending';
 $code='offline payment';
