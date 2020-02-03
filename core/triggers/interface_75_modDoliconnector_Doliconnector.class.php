@@ -135,8 +135,9 @@ $data = array(
     'name'  => $object->name,
     'email' => $object->email,
     'url' => $object->url, 
+    'locale' => $object->default_lang,  
 );
-if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
+//if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
 
 $result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
 $response=json_decode($result);
