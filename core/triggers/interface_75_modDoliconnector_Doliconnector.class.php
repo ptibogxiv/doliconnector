@@ -134,8 +134,11 @@ $wordpress=new Daodoliconnector($db);
 $data = array(
     'name'  => $object->name,
     'email' => $object->email,
+
     'url' => $object->url, 
 );
+if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
+
 $result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
 $response=json_decode($result);
 $ok=$input->ok;
@@ -158,13 +161,20 @@ $ok=$input->ok;
 		$societeaccount = new SocieteAccount($db);
 		$wdpr = $societeaccount->getCustomerAccount($object->fk_soc, 'wordpress', '1');
 
-if ( $wdpr > 0 ) { 
-
-//$result=$wordpress->doliconnectorSync("POST", '/users/'.$wdpr.'/?context=edit', json_encode($object));
-$input=json_decode($result);                 	 
+if ( $wdpr > 0 ) {
+$wordpress=new Daodoliconnector($db);
+$data = array(
+    'first_name'  => $object->firstname,
+    'last_name'  => $object->lastname,
+    'email' => $object->email,
+    'url' => $object->url, 
+);
+$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
+$response=json_decode($result);
 $ok=$input->ok;
-		}       
-}   }
+}     
+  } 
+}
 
 		return $ok;
 	}
