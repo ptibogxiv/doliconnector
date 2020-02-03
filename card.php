@@ -46,38 +46,35 @@ $result = restrictedArea($user, 'societe','','');
 if (! empty($socid) && $action=='create' && $confirm=='yes')
 {
 
+	$object = new Societe($db);
+	$result=$object->fetch($socid);
 
 	if ($user->rights->societe->creer)
 	{
-$object = new Societe($db);
-$result=$object->fetch($socid);
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-$generated_password=getRandomPassword(false);
 
 $data = array(
   "username" => $object->name,
   "email" => $object->email,
-  "password" => $generated_password,
-  "roles" => "subscriber",
+  "password" => getRandomPassword(true)
 );
 $wordpress=new Daodoliconnector($db);
-//$wordpress->doliconnectinf($object->id);
-$result=$wordpress->doliconnectSync('POST', '/users/?username='.$object->name.'&email='.$object->email.'&password='.$generated_password, json_encode($data));
-$input=json_decode($result);                 	 
-$userid=$input->ID;  
-if ( $userid > 0 ) {
+$result=$wordpress->doliconnectSync('POST', '/users/', json_encode($data));
+$response=json_decode($result);              	 
+if ( $result->id > 0 ) {
 
-            $sql  = "INSERT INTO  ".MAIN_DB_PREFIX."sync (fk_soc, wordpress, entity)";
-            $sql .= " VALUES ('$socid', '".$userid."', '$entity')";
-            if (! $db->query($sql) )
-            {
-setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, 'errors');            
-                dol_syslog(get_class($this)."::del_commercial Erreur");
-            }
-            else {
+					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
+					$sql .= " VALUES (".$socid.", '', '".$result->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
+					$resql = $db->query($sql);
+					if (! $resql)
+					{
+						$this->error = $db->lasterror();
+            setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, 'errors');
+            dol_syslog(get_class($this)."::del_commercial Erreur");           
+					}  else  {
 setEventMessages($langs->trans('SyncSuccess', $langs->trans('SyncSuccess')), null, 'mesgs');
-            }
+          }
 
 		header("Location: card.php?socid=".$socid);
 		exit;
@@ -87,7 +84,7 @@ setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, '
  		header("Location: card.php?socid=".$socid);
 		exit; 
   }
-  }
+	}
 	else
 	{
 		header("Location: ".$_SERVER["PHP_SELF"]."?socid=".$socid);
@@ -96,7 +93,6 @@ setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, '
 }
 elseif (! empty($socid) && $action=='add' && $_GET["commid"])
 {
-
 
 	if ($user->rights->societe->creer)
 	{
@@ -236,7 +232,7 @@ print $langs->trans("NoSync");
 
  	 print ''; 
  	 print '<span id="action-removepoints" class="butActionDelete">'.$langs->trans('CreateUserWordpress').'</span>'."\n"; 
-   print $form->formconfirm($_SERVER["PHP_SELF"].'?socid='.$socid,$langs->trans('CreateUserWordpress'),$langs->trans('CreateUserWordpressInfo'),'create',$formquestionremovepoints,'yes','action-removepoints',200,400);
+   print $form->formconfirm($_SERVER["PHP_SELF"].'?socid='.$socid, $langs->trans('CreateUserWordpress'), $langs->trans('CreateUserWordpressInfo'), 'create', $formquestionremovepoints, 'yes', 'action-removepoints', 200, 400);
   }
 	
 	print '</div>';
@@ -297,7 +293,7 @@ print '</td></tr>'."\n";
 //			dol_print_error($db);
 //		}
     
-	}
+	} 
 
 llxFooter();
 $db->close();
