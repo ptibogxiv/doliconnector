@@ -118,7 +118,7 @@ public function doliconnectorderitem($id)
     	}
 	}  
   
-public function doliconnectSync($methodc, $url, $datac)
+public function doliconnectSync($method, $url, $data)
 { 
 global $conf;
 
@@ -131,10 +131,10 @@ if (empty($conf->global->DOLICONNECT_ALTERNATIVE_ENTITY)){
 $url=$conf->global->MAIN_INFO_SOCIETE_WEB."/wp-json/wp/v2".$url;
 
 $curl=curl_init();
-curl_setopt($curl,CURLOPT_CUSTOMREQUEST, $methodc);
+curl_setopt($curl,CURLOPT_CUSTOMREQUEST, $method);
 curl_setopt($curl,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063');
 curl_setopt($curl,CURLOPT_URL,$url);
-curl_setopt($curl,CURLOPT_POSTFIELDS, $datac);
+curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,2); 
 curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
 $httpheader = ['Authorization: Basic ' . base64_encode( ''.$conf->global->DOLICONNECT_USER.':'.$conf->global->DOLICONNECT_PASSWORD.'' )];

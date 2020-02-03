@@ -60,7 +60,7 @@ $data = array(
   "password" => getRandomPassword(true)
 );
 $wordpress=new Daodoliconnector($db);
-$result=$wordpress->doliconnectSync('POST', '/users/', json_encode($data));
+$result=$wordpress->doliconnectSync('POST', '/users/', $data);
 $response=json_decode($result);
              	 
 if ( $response->id > 0 ) {
@@ -288,7 +288,7 @@ print '</td></tr>'."\n";
 //			dol_print_error($db);
 //		}
     
-	} 
+	}
 
 llxFooter();
 $db->close();

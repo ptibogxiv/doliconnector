@@ -131,11 +131,12 @@ $ok=0;
 
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
-$data = [
+$data = array(
     'name'  => $object->name,
-    'email' => $object->email
-	];
-$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr.'/?context=edit', $data);
+    'email' => $object->email,
+    'url' => $object->url, 
+);
+$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
 $response=json_decode($result);
 $ok=$input->ok;
 }
