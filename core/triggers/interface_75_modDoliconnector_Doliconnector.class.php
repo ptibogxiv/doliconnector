@@ -134,7 +134,6 @@ $wordpress=new Daodoliconnector($db);
 $data = array(
     'name'  => $object->name,
     'email' => $object->email,
-
     'url' => $object->url, 
 );
 if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
