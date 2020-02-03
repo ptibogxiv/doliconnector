@@ -61,11 +61,11 @@ $data = array(
 );
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('POST', '/users/', json_encode($data));
-$response=json_decode($result); 
+$response=json_decode($result);
              	 
-if ( $result->id > 0 ) {
+if ( $response->id > 0 ) {
 					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
-					$sql .= " VALUES (".$socid.", '', '".$result->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
+					$sql .= " VALUES (".$socid.", '', '".$response->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
 					$resql = $db->query($sql);
 }       
 					if (! $resql)
@@ -184,7 +184,7 @@ if (! empty($socid))
     print '</td>';
     print '</tr>';
 $email=$object->email;
-	// Liste les commerciaux
+
 	print '<tr><td>'.$langs->trans('LinkedToWordpress').'</td>';
 	print '<td colspan="3">';    
 		$societeaccount = new SocieteAccount($db);
