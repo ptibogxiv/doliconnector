@@ -55,13 +55,14 @@ if (! empty($socid) && $action=='create' && $confirm=='yes')
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 
 $data = array(
-  "username" => $object->name,
-  "email" => $object->email,
+  "username" => trim(str_replace(" ", "",$object->name)),
+  "email" => trim($object->email),
   "password" => getRandomPassword(true)
 );
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('POST', '/users/', $data);
 $response=json_decode($result);
+print $result;
              	 
 if ( $response->id > 0 ) {
 					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
