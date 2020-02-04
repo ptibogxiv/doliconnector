@@ -149,7 +149,7 @@ $ok=$input->ok;
      
  	if ($action == 'COMPANY_DELETE') {
 //NO ACTION
-		}    
+		}  
           
  if ($action == 'MEMBER_MODIFY') {
 			dol_syslog(
@@ -175,6 +175,10 @@ $ok=$input->ok;
 }     
   } 
 }
+
+ 	if ($action == 'STOCK_MOVEMENT') {
+//NO ACTION
+		}    
 
 		return $ok;
 	}
