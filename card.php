@@ -55,9 +55,12 @@ if (! empty($socid) && $action=='create' && $confirm=='yes')
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 
 $data = array(
-  "username" => trim(str_replace(" ", "",$object->name)),
-  "email" => trim($object->email),
-  "password" => getRandomPassword(true)
+    'username' => uniqid(),
+    'name'  => trim($object->name),
+    'email' => trim($object->email),
+    'url' => trim($object->url), 
+    'locale' => $object->default_lang,
+    'password' => getRandomPassword(true)
 );
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('POST', '/users/', $data);

@@ -132,9 +132,9 @@ $ok=0;
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $data = array(
-    'name'  => $object->name,
-    'email' => $object->email,
-    'url' => $object->url, 
+    'name'  => trim($object->name),
+    'email' => trim($object->email),
+    'url' => trim($object->url),  
     'locale' => $object->default_lang,  
 );
 //if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
