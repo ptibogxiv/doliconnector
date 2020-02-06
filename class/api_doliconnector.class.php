@@ -673,7 +673,7 @@ if (! empty($conf->stripe->enabled))
 			$payment_method->detach();
 			}
         }
-        else
+        elseif (preg_match('/src_/', $method) || preg_match('/tok_/', $method))
 				{
 				$cu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
 				$card=$cu->sources->retrieve("$method");
@@ -683,6 +683,24 @@ if (! empty($conf->stripe->enabled))
 					if (method_exists($card, 'detach')) $card->detach();
 					else $card->delete();
 				}
+        } else {
+		$companybankaccount = new CompanyBankAccount($this->db);
+		if ($companybankaccount->fetch($method))
+		{
+			$result = $companybankaccount->delete($user);
+			if ($result > 0)
+			{
+				//success
+			}
+			else
+			{
+				//error
+			}
+		}
+		else
+		{
+			//error
+		}
         }
                                                                        
         return array(
