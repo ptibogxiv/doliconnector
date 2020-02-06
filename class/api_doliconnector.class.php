@@ -438,8 +438,14 @@ if (is_array($rib_list)) {
 		foreach ($rib_list as $rib)
 		{
 $list[$src->id]['id'] = $rib->id;
+if (!empty($conf->prelevement->enabled))
+{
 $list[$src->id]['type'] = 'PRE';
 $list[$src->id]['brand'] = 'PRE';
+} else {
+$list[$src->id]['type'] = 'VIR';
+$list[$src->id]['brand'] = 'VIR';
+}
 $list[$src->id]['holder'] = $rib->label;
 $list[$src->id]['reference'] = $rib->iban;
 $list[$src->id]['mandate_reference'] = $rib->rum;
