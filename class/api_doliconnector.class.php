@@ -453,6 +453,7 @@ $list[$src->id]['mandate_url'] = '';
 $list[$src->id]['date_creation'] =  $rib->date_rum;
 $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = substr($rib->iban, 0, 2);
+$list[$src->id]['default_source'] = $rib->default_rib;
 }
 }
 
