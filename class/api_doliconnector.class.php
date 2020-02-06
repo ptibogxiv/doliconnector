@@ -247,6 +247,8 @@ $infothirdparty =array(
 						"email" => $this->company->email,
 						"countrycode" => $this->company->country_code
             );
+            
+$list = array();
 
 if (! empty($conf->stripe->enabled)) {
 	$service = 'StripeTest';
@@ -326,8 +328,6 @@ $stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_co
 
 $infostripe['client_secret'] = $stripeClientSecret->client_secret;
 
-$list = array();
-
 if ( $listofpaymentmethods1 != null ) {
 
 foreach ( $listofpaymentmethods1 as $src ) {
@@ -392,6 +392,7 @@ $list[$src->id]['brand'] = 'sepa_debit';
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
 $list[$src->id]['mandate_reference'] = $src->sepa_debit->mandate_reference;
 $list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
+$list[$src->id]['date_creation'] =  null;
 $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = $src->sepa_debit->country;
 
@@ -429,6 +430,23 @@ $chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address)
 $bank = new Account($this->db);
 $bank->fetch($conf->global->FACTURE_CHQ_NUMBER);
 $chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address);
+}
+}
+
+$rib_list = $this->company->get_all_rib();
+if (is_array($rib_list)) {
+		foreach ($rib_list as $rib)
+		{
+$list[$src->id]['id'] = $rib->id;
+$list[$src->id]['type'] = 'PRE';
+$list[$src->id]['brand'] = 'PRE';
+$list[$src->id]['holder'] = $rib->label;
+$list[$src->id]['reference'] = $rib->iban;
+$list[$src->id]['mandate_reference'] = $rib->rum;
+$list[$src->id]['mandate_url'] = '';
+$list[$src->id]['date_creation'] =  $rib->date_rum;
+$list[$src->id]['expiration'] =  null;
+$list[$src->id]['country'] = substr($rib->iban, 0, 2);
 }
 }
 
