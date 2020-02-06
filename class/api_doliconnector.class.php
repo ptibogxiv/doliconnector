@@ -437,23 +437,23 @@ $rib_list = $this->company->get_all_rib();
 if (is_array($rib_list)) {
 		foreach ($rib_list as $rib)
 		{
-$list[$src->id]['id'] = $rib->id;
+$list[$rib->id]['id'] = $rib->id;
 if (!empty($conf->prelevement->enabled))
 {
-$list[$src->id]['type'] = 'PRE';
-$list[$src->id]['brand'] = 'PRE';
+$list[$rib->id]['type'] = 'PRE';
+$list[$rib->id]['brand'] = 'PRE';
 } else {
-$list[$src->id]['type'] = 'VIR';
-$list[$src->id]['brand'] = 'VIR';
+$list[$rib->id]['type'] = 'VIR';
+$list[$rib->id]['brand'] = 'VIR';
 }
-$list[$src->id]['holder'] = $rib->label;
-$list[$src->id]['reference'] = $rib->iban;
-$list[$src->id]['mandate_reference'] = $rib->rum;
-$list[$src->id]['mandate_url'] = '';
-$list[$src->id]['date_creation'] =  $rib->date_rum;
-$list[$src->id]['expiration'] =  null;
-$list[$src->id]['country'] = substr($rib->iban, 0, 2);
-$list[$src->id]['default_source'] = $rib->default_rib;
+$list[$rib->id]['holder'] = $rib->label;
+$list[$rib->id]['reference'] = $rib->iban;
+$list[$rib->id]['mandate_reference'] = $rib->rum;
+$list[$rib->id]['mandate_url'] = '';
+$list[$rib->id]['date_creation'] =  $rib->date_rum;
+$list[$rib->id]['expiration'] =  null;
+$list[$rib->id]['country'] = substr($rib->iban, 0, 2);
+$list[$rib->id]['default_source'] = $rib->default_rib;
 }
 }
 
