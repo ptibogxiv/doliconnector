@@ -446,7 +446,7 @@ $list[$rib->id]['brand'] = 'PRE';
 $list[$rib->id]['type'] = 'VIR';
 $list[$rib->id]['brand'] = 'VIR';
 }
-$list[$rib->id]['holder'] = $rib->label;
+$list[$rib->id]['holder'] = $rib->proprio;
 $list[$rib->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.substr($rib->iban, -4);
 $list[$rib->id]['mandate_reference'] = $rib->rum;
 $list[$rib->id]['mandate_url'] = '';
