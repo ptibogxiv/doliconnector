@@ -36,7 +36,7 @@ class modDoliconnector extends DolibarrModules {
 	 * @param DoliDB		Database handler
 	 */
 	function __construct($db) {
-		global $conf;
+		global $langs,$conf;
 		
 		$this->db = $db;
 		
@@ -94,11 +94,40 @@ class modDoliconnector extends DolibarrModules {
 				),
 		);
 
-      // Data directories to create when module is enabled
-        $this->dirs = array();
+    // Data directories to create when module is enabled
+    $this->dirs = array();
+		// Exports
+		$r=1;
+	}
 
-  }
+	/**
+	 *		Function called when module is enabled.
+	 *		The init function add constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
+	 *		It also creates data directories
+	 *
+     *      @param      string	$options    Options when enabling module ('', 'noboxes')
+	 *      @return     int             	1 if OK, 0 if KO
+	 */
+	public function init($options='')
+	{
+		$sql = array();
+
+		return $this->_init($sql, $options);
+	}
+
+	/**
+	 * Function called when module is disabled.
+	 * Remove from database constants, boxes and permissions from Dolibarr database.
+	 * Data directories are not deleted
+	 *
+	 * @param      string	$options    Options when enabling module ('', 'noboxes')
+	 * @return     int             	1 if OK, 0 if KO
+	 */
+	public function remove($options = '')
+	{
+		$sql = array();
+
+		return $this->_remove($sql, $options);
+	}
 
 }
-
-?>
