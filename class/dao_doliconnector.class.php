@@ -118,7 +118,7 @@ public function doliconnectorderitem($id)
     	}
 	}  
   
-public function doliconnectSync($method, $url, $data)
+public function doliconnectSync($method, $url, $data = null)
 { 
 global $conf;
 
@@ -134,7 +134,7 @@ $curl=curl_init();
 curl_setopt($curl,CURLOPT_CUSTOMREQUEST, $method);
 curl_setopt($curl,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063');
 curl_setopt($curl,CURLOPT_URL,$url);
-curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
+if ($data) curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,2); 
 curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
 $httpheader = ['Authorization: Basic ' . base64_encode( ''.$conf->global->DOLICONNECT_USER.':'.$conf->global->DOLICONNECT_PASSWORD.'' )];
@@ -142,7 +142,7 @@ $httpheader[] = "Content-Type:application/json";
 curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheader);
 $response = curl_exec($curl);
 curl_close($curl);
-return $response;
+return json_decode($response);
 } 
   
 }

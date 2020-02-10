@@ -64,12 +64,10 @@ $data = array(
 );
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('POST', '/users/', $data);
-$response=json_decode($result);
-print $result;
              	 
-if ( $response->id > 0 ) {
+if ( $result->id > 0 ) {
 					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
-					$sql .= " VALUES (".$socid.", '', '".$response->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
+					$sql .= " VALUES (".$socid.", '', '".$result->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
 					$resql = $db->query($sql);
 }       
 					if (! $resql)
@@ -196,8 +194,7 @@ $email=$object->email;
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
-$response=json_decode($result);
-  			  print $response->name.' ('.$response->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wdpr.'">';
+  			  print $result->name.' ('.$result->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wdpr.'">';
 			    print img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink');
 			    print '</a>'; 
 			}
@@ -258,10 +255,9 @@ print $langs->trans("NoSync");
       print '<td>&nbsp;</td>';
 			print "</tr>\n";
 $wordpress=new Daodoliconnector($db);
-$result=$wordpress->doliconnectSync('GET', '/users/?context=edit&per_page=100', ''); 
+$result=$wordpress->doliconnectSync('GET', '/users/?context=edit&per_page=100', null); 
 //print $result;     
-$input=json_decode($result);
-foreach ($input as $user ) { 
+foreach ($result as $user ) { 
 $wordpress->getThirparty($user->id, '1');
 $wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
 print "<tr ".$bc[$var]."><td>";
