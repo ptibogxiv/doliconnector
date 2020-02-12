@@ -72,9 +72,9 @@ if ( $result->id > 0 ) {
 }       
 					if (! $resql)
 					{
-						$this->error = $db->lasterror();
+						$db->error = $db->lasterror();
             setEventMessages($langs->trans('SyncError', $langs->trans('SyncError')), null, 'errors');
-            dol_syslog(get_class($this)."::del_commercial Erreur");           
+            dol_syslog(get_class($db)."::del_commercial Erreur");           
 					}  else  {
 setEventMessages($langs->trans('SyncSuccess', $langs->trans('SyncSuccess')), null, 'mesgs');
           }
@@ -256,7 +256,8 @@ print $langs->trans("NoSync");
 			print "</tr>\n";
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('GET', '/users/?context=edit&per_page=100', null); 
-//print $result;     
+//print $result;
+if ($result) {     
 foreach ($result as $user ) { 
 $wordpress->getThirparty($user->id, '1');
 $wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
@@ -279,6 +280,7 @@ print '<td>'.$user->email.'</td><td>';
 }
 
 print '</td></tr>'."\n";
+}
 }
 			print "</table>";
 			//$db->free($resql);
