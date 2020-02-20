@@ -52,8 +52,8 @@ class Daodoliconnector extends CommonObject
 	{
 		$sql = "SELECT sa.fk_soc as fk_soc, sa.entity";
 		$sql.= " FROM " . MAIN_DB_PREFIX . "societe_account as sa";
-		$sql.= " WHERE sa.key_account = " . $id;
-		$sql.= " AND sa.entity IN (".getEntity('societe').")";
+		$sql.= " WHERE sa.entity IN (".getEntity('societe').")";
+		$sql.= " AND sa.key_account = " . $id;
 		$sql.= " AND sa.site = 'wordpress' AND sa.status = ".((int) $status);
 		//$sql.= " AND key_account IS NOT NULL AND key_account <> ''";
 		//$sql.= " ORDER BY sa.key_account DESC";
