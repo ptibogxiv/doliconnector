@@ -878,7 +878,8 @@ $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-	$result=$invoice->validate(DolibarrApiAccess::$user);  
+  if (!empty($conf->stock->enabled) && $object->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+	$result=$invoice->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
 // no action if OK
 } else {
