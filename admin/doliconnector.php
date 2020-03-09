@@ -108,7 +108,7 @@ print "</td></tr>\n";
 
 print '<tr class="oddeven"><td>'.$langs->trans("DoliconnectIdWareHouse").'</td>';	// Force warehouse (this is not a default value)
 print '<td colspan="2">';
-print $formproduct->selectWarehouses($conf->global->{'DOLICONNECT_ID_WAREHOUSE'.$terminal}, 'DOLICONNECT_ID_WAREHOUSE', '', 1, '');
+print $formproduct->selectWarehouses($conf->global->DOLICONNECT_ID_WAREHOUSE, 'DOLICONNECT_ID_WAREHOUSE', '', 1, '');
 print ' <a href="'.DOL_URL_ROOT.'/product/stock/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"]).'">('.$langs->trans("Create").')</a>';
 print '</td></tr>';
 

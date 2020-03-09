@@ -798,7 +798,8 @@ if (preg_match('/order/', $object)) {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut == 0 && $order->billed != 1) {
-$order->valid(DolibarrApiAccess::$user,0,0); // id warehouse to change !!!!!!       
+if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+$order->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
 $order->fetch($item);
 }
 if ($order->statut == 1 && $order->billed != 1) {
