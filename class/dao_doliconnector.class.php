@@ -143,6 +143,91 @@ curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheader);
 $response = curl_exec($curl);
 curl_close($curl);
 return json_decode($response);
-} 
+}
+
+	/**
+	 * Send reminders by emails before subscription end
+	 * CAN BE A CRON TASK
+	 *
+	 * @param	string		$daysbeforeendlist		Nb of days before end of subscription (negative number = after subscription). Can be a list of delay, separated by a semicolon, for example '10;5;0;-5'
+	 * @return	int									0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
+	 */
+	public function DeleteExpiredBasket($secondbeforedelete = '3600')
+	{
+
+        global $conf, $langs, $user;
+
+        $this->output = '';
+        $this->error='';
+
+		$now = dol_now();
+		$nbok = 0;
+		$nbko = 0;
+
+		$listofordersok = array();
+		$listofordersko = array();
+        
+		if (empty($conf->commande->enabled)) // Should not happen. If module disabled, cron job should not be visible.
+		{
+			$langs->load("order");
+			$this->output = $langs->trans('ModuleNotEnabled', $langs->transnoentitiesnoconv("Commande"));
+			return 0;
+		}
+        $return = 0;
+        dol_syslog(__METHOD__, LOG_DEBUG);
+        require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
+
+        $sql = "SELECT t.rowid";
+        $sql .= " FROM ".MAIN_DB_PREFIX."commande as t";
+
+        $sql .= ' WHERE t.entity IN ('.getEntity('commande').')';
+        $sql .= " AND t.fk_statut = 0"; // Join for the needed table to filter by sale
+        $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
+
+        if ($limit) {
+            if ($page < 0)
+            {
+                $page = 0;
+            }
+            $offset = $limit * $page;
+
+            $sql .= $this->db->plimit($limit + 1, $offset);
+        }
+
+        dol_syslog("API Rest request");
+        $result = $this->db->query($sql);
+
+        if ($result)
+        {
+            $num = $this->db->num_rows($result);
+            $min = min($num, ($limit <= 0 ? $num : $limit));
+            $i = 0;
+            while ($i < $min)
+            {
+                $obj = $this->db->fetch_object($result);
+                $commande_static = new Commande($this->db);
+                if ($commande_static->fetch($obj->rowid)) {
+                    // Add external contacts ids
+                if ($commande_static->date_modification < (dol_now()-$secondbeforedelete)) {
+                $result2 = $commande_static->delete($user, 0);		
+                if (!empty($result2)) { $nbok++; }
+                }    
+
+                }
+            $i++;
+            }
+			$this->output = 'Found '.($i).' draft orders.';
+			$this->output .= ' Delete '.$nbok.' draft orders';
+        }
+        else {
+            dol_syslog(__METHOD__.': Error when retrieve order list', LOG_ERR);
+            $this->output .= "Error when retrieve order list\n";
+        }
+        //if (!$i) {
+        //    $this->output .= "No draft order to delete found\n";
+        //}
+
+		return 0;
+	} 
   
 }

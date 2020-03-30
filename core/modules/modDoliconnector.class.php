@@ -98,6 +98,26 @@ class modDoliconnector extends DolibarrModules {
     $this->dirs = array();
 		// Exports
 		$r=1;
+    
+    // Cronjobs
+    $arraydate=dol_getdate(dol_now());
+    $datestart=dol_mktime(22, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
+    $this->cronjobs = array(
+        0=>array(
+            'label'=>'DeleteExpiredBasketTitle',
+            'jobtype'=>'method', 'class'=>'/doliconnector/class/dao_doliconnector.class.php',
+            'objectname'=>'Daodoliconnector',
+            'method'=>'DeleteExpiredBasket',
+            'parameters'=>'3600',
+            'comment'=>'DeleteExpiredBasket',
+            'frequency'=>1,
+            'unitfrequency'=> 300,
+            'priority'=>50,
+            'status'=>1,
+            'test'=>$conf->commande->enabled,
+            'datestart'=>$datestart
+        ),
+    );
 	}
 
 	/**
