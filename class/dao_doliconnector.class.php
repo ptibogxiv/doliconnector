@@ -152,7 +152,7 @@ return json_decode($response);
 	 * @param	string		$daysbeforeendlist		Nb of days before end of subscription (negative number = after subscription). Can be a list of delay, separated by a semicolon, for example '10;5;0;-5'
 	 * @return	int									0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
 	 */
-	public function DeleteExpiredBasket($secondbeforedelete = '3600')
+	public function DeleteExpiredBasket($secondbeforedelete = '3600', $doliconnect = 1)
 	{
 
         global $conf, $langs, $user;
@@ -182,7 +182,7 @@ return json_decode($response);
 
         $sql .= ' WHERE t.entity IN ('.getEntity('commande').')';
         $sql .= " AND t.fk_statut = 0"; // Join for the needed table to filter by sale
-        $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
+        if ($doliconnect) $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
 
         if ($limit) {
             if ($page < 0)
