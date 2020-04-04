@@ -163,6 +163,9 @@ return json_decode($response);
 		$now = dol_now();
 		$nbok = 0;
 		$nbko = 0;
+    
+    $user = new User($this->db);
+    $user->fetch($conf->global->DOLICONNECT_USER_AUTOMATIC);
 
 		$listofordersok = array();
 		$listofordersko = array();
