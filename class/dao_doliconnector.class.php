@@ -16,8 +16,8 @@
  */
 
 // Put here all includes required by your class file
-require_once (DOL_DOCUMENT_ROOT . "/core/class/commonobject.class.php");
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . "/core/class/commonobject.class.php";
+require_once DOL_DOCUMENT_ROOT . "/user/class/user.class.php";
 
 /**
  *	\class      Rewards
@@ -164,8 +164,8 @@ return json_decode($response);
 		$nbok = 0;
 		$nbko = 0;
     
-    $user = new User($this->db);
-    $user->fetch($conf->global->DOLICONNECT_USER_AUTOMATIC);
+    //$user = new User($this->db);
+    //$user->fetch($conf->global->DOLICONNECT_USER_AUTOMATIC);
 
 		$listofordersok = array();
 		$listofordersko = array();
