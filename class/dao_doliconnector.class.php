@@ -17,7 +17,6 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT . "/core/class/commonobject.class.php";
-require_once DOL_DOCUMENT_ROOT . "/user/class/user.class.php";
 
 /**
  *	\class      Rewards
@@ -186,16 +185,6 @@ return json_decode($response);
         $sql .= ' WHERE t.entity IN ('.getEntity('commande').')';
         $sql .= " AND t.fk_statut = 0"; // Join for the needed table to filter by sale
         if ($doliconnect) $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
-
-        if ($limit) {
-            if ($page < 0)
-            {
-                $page = 0;
-            }
-            $offset = $limit * $page;
-
-            $sql .= $this->db->plimit($limit + 1, $offset);
-        }
 
         dol_syslog("API Rest request");
         $result = $this->db->query($sql);
