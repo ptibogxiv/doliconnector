@@ -183,6 +183,7 @@ return json_decode($response);
         $sql .= " FROM ".MAIN_DB_PREFIX."commande as t";
 
         $sql .= ' WHERE t.entity IN ('.getEntity('commande').')';
+        $sql .= " AND t.date_valid IS NULL"; // Join for the needed table to filter by sale     
         $sql .= " AND t.fk_statut = 0"; // Join for the needed table to filter by sale
         if ($doliconnect) $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
 
