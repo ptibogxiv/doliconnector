@@ -328,7 +328,7 @@ $stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_co
 
 $infostripe['client_secret'] = $stripeClientSecret->client_secret;
 
-if ( $listofpaymentmethods1 != null ) {
+if ( $listofpaymentmethods1 != null ) { 
 
 foreach ( $listofpaymentmethods1 as $src ) {
 
@@ -359,10 +359,16 @@ $list[$src->id]['holder'] = $src->billing_details->name;
 
 $list[$src->id]['brand'] = 'sepa_debit';
 $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->last4;
-$list[$src->id]['mandate_reference'] = $src->sepa_debit->mandate_reference;
-$list[$src->id]['mandate_url'] = $src->sepa_debit->mandate_url;
 $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = $src->sepa_debit->country;
+
+$setupintent = \Stripe\SetupIntent::all(['customer' => $customerstripe->id,'payment_method' => $src->id,'limit' => 1]);
+$mandate = \Stripe\Mandate::retrieve($setupintent->data[0]->mandate);
+$type = $mandate->payment_method_details->type;
+$list[$src->id]['mandate']['creation'] = $mandate->customer_acceptance->accepted_at;
+$list[$src->id]['mandate']['reference'] = $mandate->payment_method_details->$type->reference;
+$list[$src->id]['mandate']['url'] = $mandate->payment_method_details->$type->url;
+$list[$src->id]['mandate']['type'] = $mandate->type;
 
 if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
