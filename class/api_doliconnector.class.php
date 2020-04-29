@@ -363,13 +363,14 @@ $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = $src->sepa_debit->country;
 
 $setupintent = \Stripe\SetupIntent::all(['customer' => $customerstripe->id,'payment_method' => $src->id,'limit' => 1]);
+if (isset($setupintent->data[0]->mandate) && !empty($setupintent->data[0]->mandate)) {
 $mandate = \Stripe\Mandate::retrieve($setupintent->data[0]->mandate);
 $type = $mandate->payment_method_details->type;
 $list[$src->id]['mandate']['creation'] = $mandate->customer_acceptance->accepted_at;
 $list[$src->id]['mandate']['reference'] = $mandate->payment_method_details->$type->reference;
 $list[$src->id]['mandate']['url'] = $mandate->payment_method_details->$type->url;
 $list[$src->id]['mandate']['type'] = $mandate->type;
-
+}
 if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
