@@ -794,14 +794,14 @@ $paymentmethod=$src->id;
 } 
 
 if ($src->type == 'card') {
-$paymentid = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_id = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
 } elseif ($src->type == 'sepa_debit') {
-$paymentid = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_id = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
 } elseif ($src->type == 'ideal') {
-$paymentid = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_id = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
 } else {
-$paymentid = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
-if ($paymentid <= 0) {
+$mode_reglement_id = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
+if ($mode_reglement_id <= 0) {
 throw new RestException(404, 'payment method '.$paymentmethod.' not found');
 }
 }
@@ -818,7 +818,7 @@ $object->valid(DolibarrApiAccess::$user, $idwarehouse, 0);
 $object->fetch($item);
 }
 if (!$error && $object->statut == 1 && $object->billed != 1) {
-$object->mode_reglement_id = $paymentid; 
+$object->mode_reglement_id = $mode_reglement_id; 
 $object->update(DolibarrApiAccess::$user, 1);
 } else {
 throw new RestException(400, 'Order already billed');
@@ -843,23 +843,23 @@ $currency = $object->multicurrency_code;
 $total = price2num($object->total_ttc);
 $origin = 'order';
 } elseif (preg_match('/invoice/', $modulepart)) {
-$invoice = new Facture($this->db);
-$invoice->fetch($item);
+$object = new Facture($this->db);
+$result = $object->fetch($item);
 		if (!$result) {
 			throw new RestException(404, 'Item not found');
 		}
-if (!$error && $invoice->statut == 1 && $invoice->paye != 1) {
-$invoice->mode_reglement_id = $paymentid; 
-$invoice->update(DolibarrApiAccess::$user, 1);
+if (!$error && $object->statut == 1 && $object->paye != 1) {
+$object->mode_reglement_id = $mode_reglement_id; 
+$object->update(DolibarrApiAccess::$user, 1);
 } else {
 throw new RestException(400, 'Invoice already paid');
 }
-$paiement = $invoice->getSommePaiement();
-$creditnotes = $invoice->getSumCreditNotesUsed();
-$deposits = $invoice->getSumDepositsUsed();
-$ref = $invoice->ref;
-$currency = $invoice->multicurrency_code;
-$total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, 'MT');
+$paiement = $object->getSommePaiement();
+$creditnotes = $object->getSumCreditNotesUsed();
+$deposits = $object->getSumDepositsUsed();
+$ref = $object->ref;
+$currency = $object->multicurrency_code;
+$total = price2num($object->total_ttc - $paiement - $creditnotes - $deposits, 'MT');
 $origin = 'invoice';
 } else {
 throw new RestException(400, 'Modulepart not supported yet');
@@ -883,7 +883,7 @@ if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $
 		}
       $paiementid = $paymentmethod;
 } else {
-$status='pending';
+$paiementid='pending';
 $error++;
 }
 
@@ -891,12 +891,12 @@ if ($error || (isset($charge->id) && $charge->statut == 'error')) {
 $msg=$charge->message;
 $code=$charge->code;
 $error++;
-} elseif (!$error && preg_match('/order/', $modulepart) && $order->billed != 1) {
+} elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-  if (!empty($conf->stock->enabled) && $object->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+  if (!empty($conf->stock->enabled) && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
 	$result=$invoice->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
 // no action if OK
@@ -928,7 +928,7 @@ $multicurrency_amounts=array();
       $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1, $this->company);
 }
 
-if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
+if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
 			{
 				$outputlangs = $langs;
 				$newlang = '';
@@ -948,7 +948,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 throw new RestException(500, $paiement->errors);
 	        }
       
-	    if (! $error && $paiement_id > 0 && ! empty($conf->banque->enabled))
+	    if (!$error && $paiement_id > 0 && ! empty($conf->banque->enabled))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
@@ -959,11 +959,12 @@ throw new RestException(500, $paiement->errors);
 throw new RestException(500, $paiement->errors);
 	        } 
         if (preg_match('/order/', $modulepart) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
-        $order->classifyBilled(DolibarrApiAccess::$user);
+        $object->classifyBilled(DolibarrApiAccess::$user);
         }                     
 	    }          
             return array(
-            'charge' => $charge->id,
+            'charge' => $paiementid,
+            'mode_reglement' => $paymentmethod,
             'status' => $object->statut,
             'reference' => $object->ref,
             'code' => $code
