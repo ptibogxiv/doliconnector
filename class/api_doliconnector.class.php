@@ -807,16 +807,19 @@ throw new RestException(404, 'payment method '.$paymentmethod.' not found');
 }
 
 if (preg_match('/order/', $modulepart)) {
-$order=new Commande($this->db);
-$order->fetch($item);
-if ($order->statut == 0 && $order->billed != 1) {
+$object=new Commande($this->db);
+$result = $object->fetch($item);
+		if (!$result) {
+			throw new RestException(404, 'Item not found');
+		}
+if ($object->statut == 0 && $object->billed != 1) {
 if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
-$order->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
-$order->fetch($item);
+$object->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
+$object->fetch($item);
 }
-if (!$error && $order->statut == 1 && $order->billed != 1) {
-$order->mode_reglement_id = $paymentid; 
-$order->update(DolibarrApiAccess::$user, 1);
+if (!$error && $object->statut == 1 && $object->billed != 1) {
+$object->mode_reglement_id = $paymentid; 
+$object->update(DolibarrApiAccess::$user, 1);
 } else {
 throw new RestException(400, 'Order already billed');
 }
@@ -825,24 +828,26 @@ throw new RestException(400, 'Order already billed');
 				// Define output language
 				$outputlangs = $langs;
 				$newlang = '';
-				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $order->thirdparty->default_lang;
+				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object->thirdparty->default_lang;
 				if (! empty($newlang)) {
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
 
-				$ret = $order->fetch($item); // Reload to get new records
-				$order->generateDocument($order->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
+				$ret = $object->fetch($item); // Reload to get new records
+				$object->generateDocument($object->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 				}
         
-$ref = $order->ref;
-$currency = $order->multicurrency_code;
-$total = price2num($order->total_ttc);
+$ref = $object->ref;
+$currency = $object->multicurrency_code;
+$total = price2num($object->total_ttc);
 $origin = 'order';
-}
-elseif (preg_match('/invoice/', $modulepart)) {
+} elseif (preg_match('/invoice/', $modulepart)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
+		if (!$result) {
+			throw new RestException(404, 'Item not found');
+		}
 if (!$error && $invoice->statut == 1 && $invoice->paye != 1) {
 $invoice->mode_reglement_id = $paymentid; 
 $invoice->update(DolibarrApiAccess::$user, 1);
@@ -890,7 +895,7 @@ $code=$charge->code;
 $error++;
 } elseif (!$error && preg_match('/order/', $modulepart) && $order->billed != 1) {
 $invoice = new Facture($this->db);
-$idinv=$invoice->createFromOrder($order, DolibarrApiAccess::$user);
+$idinv=$invoice->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
   if (!empty($conf->stock->enabled) && $object->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
