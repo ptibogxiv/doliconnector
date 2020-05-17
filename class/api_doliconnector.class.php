@@ -883,8 +883,6 @@ if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $
 		}
       $paiementid = $paymentmethod;
 } else {
-$msg='pending';
-$code='offline payment';
 $status='pending';
 $error++;
 }
@@ -947,7 +945,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	    	if ($paiement_id < 0)
 	        {
 	            $msg=$paiement->errors;
-	            $error++;
+throw new RestException(500, $paiement->errors);
 	        }
       
 	    if (! $error && $paiement_id > 0 && ! empty($conf->banque->enabled))
@@ -958,7 +956,7 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	        if ($result < 0)
 	        {
 	            $msg=$paiement->errors;
-	            $error++;
+throw new RestException(500, $paiement->errors);
 	        } 
         if (preg_match('/order/', $modulepart) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
         $order->classifyBilled(DolibarrApiAccess::$user);
@@ -966,10 +964,9 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	    }          
             return array(
             'charge' => $charge->id,
-            'status' => $charge->status,
+            'status' => $object->statut,
             'reference' => $object->ref,
-            'code' => $code,
-            'message' => $msg
+            'code' => $code
         );
     } 
     
