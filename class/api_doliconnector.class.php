@@ -817,8 +817,7 @@ $order->fetch($item);
 if (!$error && $order->statut == 1 && $order->billed != 1) {
 $order->mode_reglement_id = $paymentid; 
 $order->update(DolibarrApiAccess::$user, 1);
-}
-else {
+} else {
 throw new RestException(400, 'Order already billed');
 }
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
@@ -844,8 +843,12 @@ $origin = 'order';
 elseif (preg_match('/invoice/', $modulepart)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
+if (!$error && $invoice->statut == 1 && $invoice->paye != 1) {
 $invoice->mode_reglement_id = $paymentid; 
 $invoice->update(DolibarrApiAccess::$user, 1);
+} else {
+throw new RestException(400, 'Invoice already paid');
+}
 $paiement = $invoice->getSommePaiement();
 $creditnotes = $invoice->getSumCreditNotesUsed();
 $deposits = $invoice->getSumDepositsUsed();
