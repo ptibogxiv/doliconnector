@@ -722,16 +722,18 @@ if (! empty($conf->stripe->enabled))
       /**
      * Pay an object
      *
-     * @param string  $object         Type of object to pay 
+     * @param string  $modulepart         Name of module or area concerned ('proposal', 'order', 'invoice', 'supplier_invoice', 'shipment', 'project', ...) 
      * @param int   $item         Id of object to pay
      * @param string $paymentintent         Force payment intent {@from body}
      * @param string $paymentmethod         Payment method {@from body}
      * @param int $save         Save payment method {@from body}
      * @return int  ID of subscription
      *
-     * @url POST pay/{object}/{item}
+     * @url POST pay/{modulepart}/{item}
+     * 
+    * @throws RestException
      */
-    function payObject($object, $item, $paymentmethod, $paymentintent = null, $save = null)
+    function payObject($modulepart, $item, $paymentmethod, $paymentintent = null, $save = null)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
@@ -799,9 +801,12 @@ $paymentid = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
 $paymentid = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
 } else {
 $paymentid = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
+if ($paymentid <= 0) {
+throw new RestException(404, 'payment method '.$paymentmethod.' not found');
+}
 }
 
-if (preg_match('/order/', $object)) {
+if (preg_match('/order/', $modulepart)) {
 $order=new Commande($this->db);
 $order->fetch($item);
 if ($order->statut == 0 && $order->billed != 1) {
@@ -809,14 +814,12 @@ if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VA
 $order->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
 $order->fetch($item);
 }
-if ($order->statut == 1 && $order->billed != 1) {
+if (!$error && $order->statut == 1 && $order->billed != 1) {
 $order->mode_reglement_id = $paymentid; 
 $order->update(DolibarrApiAccess::$user, 1);
 }
 else {
-$idref = 0;
-$msg = "order already billed";
-$error++;
+throw new RestException(400, 'Order already billed');
 }
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
 				{
@@ -838,7 +841,7 @@ $currency = $order->multicurrency_code;
 $total = price2num($order->total_ttc);
 $origin = 'order';
 }
-elseif (preg_match('/invoice/', $object)) {
+elseif (preg_match('/invoice/', $modulepart)) {
 $invoice = new Facture($this->db);
 $invoice->fetch($item);
 $invoice->mode_reglement_id = $paymentid; 
@@ -850,6 +853,8 @@ $ref = $invoice->ref;
 $currency = $invoice->multicurrency_code;
 $total = price2num($invoice->total_ttc - $paiement - $creditnotes - $deposits, 'MT');
 $origin = 'invoice';
+} else {
+throw new RestException(400, 'Modulepart not supported yet');
 }
 
 if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
@@ -880,7 +885,7 @@ if ($error || (isset($charge->id) && $charge->statut == 'error')) {
 $msg=$charge->message;
 $code=$charge->code;
 $error++;
-} elseif (!$error && preg_match('/order/', $object) && $order->billed != 1) {
+} elseif (!$error && preg_match('/order/', $modulepart) && $order->billed != 1) {
 $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($order, DolibarrApiAccess::$user);
 if ($idinv > 0)
@@ -890,12 +895,10 @@ if ($idinv > 0)
 	if ($result > 0) {
 // no action if OK
 } else {
-$msg=$invoice->error; 
-$error++;
+throw new RestException(500, $invoice->error);
 	}
 } else {
-$msg=$invoice->error;
-$error++;
+throw new RestException(500, $invoice->error);
 } 
 }
 
@@ -919,7 +922,7 @@ $multicurrency_amounts=array();
       $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1, $this->company);
 }
 
-if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $object))
+if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
 			{
 				$outputlangs = $langs;
 				$newlang = '';
@@ -949,13 +952,14 @@ if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/',
 	            $msg=$paiement->errors;
 	            $error++;
 	        } 
-        if (preg_match('/order/', $object) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
+        if (preg_match('/order/', $modulepart) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
         $order->classifyBilled(DolibarrApiAccess::$user);
         }                     
 	    }          
             return array(
             'charge' => $charge->id,
             'status' => $charge->status,
+            'reference' => $object->ref,
             'code' => $code,
             'message' => $msg
         );
