@@ -266,8 +266,8 @@ if (! empty($conf->stripe->enabled)) {
   
 $stripe = new Stripe($this->db); 
 $stripeacc = $stripe->getStripeAccount($service);
-$stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
-$customerstripe = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+$stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
+
 
 $infostripe = array();
 $infostripe['live'] = $servicestatus;
@@ -275,26 +275,26 @@ $infostripe['publishable_key'] = $publishable_key;
 $infostripe['account'] = $stripeacc;
 $infostripe['types'] = array("card");
                                                                                                
-if ($customerstripe->id) {
-//$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $customerstripe, 'card', $stripeacc, $servicestatus);
+if ($stripecu->id) {
+//$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $stripecu, 'card', $stripeacc, $servicestatus);
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"));
+    	$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "card"));
 		} else {
-			$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "card"), array("stripe_account" => $stripeacc));
+			$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "card"), array("stripe_account" => $stripeacc));
 		}
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"));
+    	$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "sepa_debit"));
 		} else {
-			$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $customerstripe->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
+			$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
 		}
-$listofpaymentmethods3 = $customerstripe->sources->data;
+$listofpaymentmethods3 = $stripecu->sources->data;
 }
 
 if ( empty($type) && empty($rowid) && $id != '0' ) {
 //$stripeSetupIntent = \Stripe\SetupIntent::create([
 //  'payment_method_types' => array('card', 'sepa_debit'),
 //]);
-$stripeClientSecret = $stripe->getSetupIntent(null, null, $customerstripe->id, $stripeacc, $servicestatus, false);
+$stripeClientSecret = $stripe->getSetupIntent(null, null, $stripecu->id, $stripeacc, $servicestatus, false);
 } elseif (!empty($type)) {
 if ($type == 'order')
 {
@@ -342,7 +342,7 @@ $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->card->last4;
 $list[$src->id]['expiration'] = $src->card->exp_year.'/'.$src->card->exp_month; 
 $list[$src->id]['country'] = $src->card->country;
 
-if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
+if ( ($stripecu->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
 
@@ -362,7 +362,7 @@ $list[$src->id]['reference'] = '&#8226;&#8226;&#8226;&#8226;'.$src->sepa_debit->
 $list[$src->id]['expiration'] =  null;
 $list[$src->id]['country'] = $src->sepa_debit->country;
 
-$setupintent = \Stripe\SetupIntent::all(['customer' => $customerstripe->id,'payment_method' => $src->id,'limit' => 1]);
+$setupintent = \Stripe\SetupIntent::all(['customer' => $stripecu->id,'payment_method' => $src->id,'limit' => 1]);
 if (isset($setupintent->data[0]->mandate) && !empty($setupintent->data[0]->mandate)) {
 $mandate = \Stripe\Mandate::retrieve($setupintent->data[0]->mandate);
 $type = $mandate->payment_method_details->type;
@@ -371,7 +371,7 @@ $list[$src->id]['mandate']['reference'] = $mandate->payment_method_details->$typ
 $list[$src->id]['mandate']['url'] = $mandate->payment_method_details->$type->url;
 $list[$src->id]['mandate']['type'] = $mandate->type;
 }
-if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
+if ( ($stripecu->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source']= $default;
 
@@ -405,7 +405,7 @@ $list[$src->id]['country'] = $src->sepa_debit->country;
 
 }
 
-if ( ($customerstripe->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
+if ( ($stripecu->invoice_settings->default_payment_method != $src->id) ) { $default = null; } else { $default="1"; }
 
 $list[$src->id]['default_source'] = $default;
 
@@ -521,7 +521,7 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);
 }
 
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
+$stripecu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
 
 $payment_method = \Stripe\PaymentMethod::retrieve($method);    
     
@@ -566,18 +566,18 @@ if (! empty($conf->stripe->enabled))
 	$stripeacc = $stripe->getStripeAccount($service);
 }
 
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
+$stripecu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);  
 
 $payment_method = \Stripe\PaymentMethod::retrieve($method, ["stripe_account" => $stripeacc]);
 
-if ($payment_method && $customerstripe) {
-$result = $payment_method->attach(['customer' => $customerstripe->id]);
+if ($payment_method && $stripecu) {
+$result = $payment_method->attach(['customer' => $stripecu->id]);
 }
 
 if ($default) {
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-$customerstripe->invoice_settings->default_payment_method = (string) $method;
-$result = $customerstripe->save();
+$stripecu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+$stripecu->invoice_settings->default_payment_method = (string) $method;
+$result = $stripecu->save();
 }
 
   
@@ -623,9 +623,9 @@ if (! empty($conf->stripe->enabled))
 }
 
 if ($default) {
-$customerstripe=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-$customerstripe->invoice_settings->default_payment_method = (string) $method;
-$result = $customerstripe->save();
+$stripecu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+$stripecu->invoice_settings->default_payment_method = (string) $method;
+$result = $stripecu->save();
 }
   
 return $result;
@@ -682,8 +682,8 @@ if (! empty($conf->stripe->enabled))
         }
         elseif (preg_match('/src_/', $method) || preg_match('/tok_/', $method))
 				{
-				$cu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
-				$card=$cu->sources->retrieve("$method");
+				$stripecu=$stripe->customerStripe($this->company, $stripeacc, $servicestatus);
+				$card=$stripecu->sources->retrieve("$method");
 				if ($card)
 				{
 					// $card->detach();  Does not work with card_, only with src_
@@ -755,11 +755,13 @@ if (! empty($conf->stripe->enabled))
 		$service = 'StripeLive';
 		$servicestatus = 1;
 	}
+  
+	// Force to use the correct API key
+	global $stripearrayofkeysbyenv;
+	$site_account = $stripearrayofkeysbyenv[$servicestatus]['publishable_key'];
 
 	$stripe = new Stripe($this->db);
-	$stripeacc = $stripe->getStripeAccount($service);
-
-$stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1)->id;
+	$stripeacc = $stripe->getStripeAccount($service); // Get Stripe OAuth connect account (no remote access to Stripe here)
 
 if (preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
@@ -865,6 +867,17 @@ $origin = 'invoice';
 throw new RestException(400, 'Modulepart not supported yet');
 }
 
+    $result = $this->company->fetch($object->socid);
+      if( ! $result ) {
+          throw new RestException(404, 'Thirdparty not found');
+      }
+
+
+if (! empty($conf->stripe->enabled))
+{
+$stripecu = $stripe->getStripeCustomerAccount($this->company->id, $servicestatus, $site_account); // Get remote Stripe customer 'cus_...' (no remote access to Stripe here)
+}
+
 if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
       $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
       $paiementid = $charge->id;
@@ -887,8 +900,7 @@ $paiementid='pending';
 $error++;
 }
 
-if ($error || (isset($charge->id) && $charge->statut == 'error')) {
-$msg=$charge->message;
+if ($error) {//|| (isset($charge->id) && $charge->statut == 'error')
 $code=$charge->code;
 $error++;
 } elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
@@ -896,7 +908,7 @@ $invoice = new Facture($this->db);
 $idinv=$invoice->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-  if (!empty($conf->stock->enabled) && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+  if (!empty($conf->stock->enabled) && $object->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
 	$result=$invoice->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
 // no action if OK
@@ -912,7 +924,7 @@ throw new RestException(500, $invoice->error);
       {           
 $datepaye = dol_now();
 $amounts=array(); 
-$amounts[$invoice->id] = $total;
+$amounts[$object->id] = $total;
 $multicurrency_amounts=array();
 //$multicurrency_amounts[$item] = $total; 
       // Creation of payment line
@@ -932,19 +944,18 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 			{
 				$outputlangs = $langs;
 				$newlang = '';
-				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $invoice->thirdparty->default_lang;
+				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object->thirdparty->default_lang;
 				if (! empty($newlang)) {
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
-				$model=$invoice->modelpdf;
+				$model=$object->modelpdf;
 				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
 
-				$invoice->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
+				$object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}         
 	    	if ($paiement_id < 0)
 	        {
-	            $msg=$paiement->errors;
 throw new RestException(500, $paiement->errors);
 	        }
       
