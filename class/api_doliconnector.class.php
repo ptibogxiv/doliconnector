@@ -723,13 +723,13 @@ if (! empty($conf->stripe->enabled))
      * Pay an object
      *
      * @param string  $modulepart         Name of module or area concerned ('proposal', 'order', 'invoice', 'supplier_invoice', 'shipment', 'project', ...) 
-     * @param int   $item         Id of object to pay
+     * @param int   $id         Id of object to pay
      * @param string $paymentintent         Force payment intent {@from body}
      * @param string $paymentmethod         Payment method {@from body}
      * @param int $save         Save payment method {@from body}
      * @return int  ID of subscription
      *
-     * @url POST pay/{modulepart}/{item}
+     * @url POST pay/{modulepart}/{id}
      * 
     * @throws RestException
      */
@@ -810,14 +810,14 @@ throw new RestException(404, 'payment method '.$paymentmethod.' not found');
 
 if (preg_match('/order/', $modulepart)) {
 $object=new Commande($this->db);
-$result = $object->fetch($item);
+$result = $object->fetch($id);
 		if (!$result) {
 			throw new RestException(404, 'Item not found');
 		}
 if ($object->statut == 0 && $object->billed != 1) {
 if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
 $object->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
-$object->fetch($item);
+$object->fetch($id);
 }
 if (!$error && $object->statut == 1 && $object->billed != 1) {
 $object->mode_reglement_id = $mode_reglement_id; 
@@ -836,7 +836,7 @@ throw new RestException(400, 'Order already billed');
 					$outputlangs->setDefaultLang($newlang);
 				}
 
-				$ret = $object->fetch($item); // Reload to get new records
+				$ret = $object->fetch($id); // Reload to get new records
 				$object->generateDocument($object->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 				}
         
@@ -846,7 +846,7 @@ $total = price2num($object->total_ttc);
 $origin = 'order';
 } elseif (preg_match('/invoice/', $modulepart)) {
 $object = new Facture($this->db);
-$result = $object->fetch($item);
+$result = $object->fetch($id);
 		if (!$result) {
 			throw new RestException(404, 'Item not found');
 		}
@@ -879,17 +879,17 @@ if (! empty($conf->stripe->enabled))
 $stripecu = $stripe->getStripeCustomerAccount($this->company->id, $servicestatus, $site_account); // Get remote Stripe customer 'cus_...' (no remote access to Stripe here)
 }
 
-if ($item > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
-      $charge = $stripe->createPaymentStripe($total, $currency, $origin, $item, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
+if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
+      $charge = $stripe->createPaymentStripe($total, $currency, $origin, $id, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
       $paiementid = $charge->id;
-} elseif ($item > 0 && preg_match('/pi_/', $paymentmethod)) {
+} elseif ($id > 0 && preg_match('/pi_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod");
 		} else {
 			$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
 		}
       $paiementid = $paymentmethod;
-} elseif ($item > 0 && preg_match('/pm_/', $paymentmethod)) {
+} elseif ($id > 0 && preg_match('/pm_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod");
 		} else {
@@ -927,7 +927,7 @@ $datepaye = dol_now();
 $amounts = array(); 
 $amounts[$object2->id] = $total;
 $multicurrency_amounts=array();
-//$multicurrency_amounts[$item] = $total; 
+//$multicurrency_amounts[$id] = $total; 
       // Creation of payment line
 	    $paiement = new Paiement($this->db);
 	    $paiement->datepaye     = $datepaye;
