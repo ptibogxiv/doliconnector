@@ -923,7 +923,7 @@ throw new RestException(500, $invoice->error);
       if (!$error)
       {           
 $datepaye = dol_now();
-$amounts=array(); 
+$amounts = array(); 
 $amounts[$object->id] = $total;
 $multicurrency_amounts=array();
 //$multicurrency_amounts[$item] = $total; 
@@ -932,12 +932,17 @@ $multicurrency_amounts=array();
 	    $paiement->datepaye     = $datepaye;
 	    $paiement->amounts      = $amounts;   // Array with all payments dispatching
 	    $paiement->multicurrency_amounts = $multicurrency_amounts;   // Array with all payments dispatching
-      $paiement->paiementid   = $paymentid;
+      $paiement->paiementid   = $mode_reglement_id;
 	    $paiement->num_payment = $charge->message;
 	    $paiement->note_public  = 'Online payment '.dol_print_date($datepaye, 'standard');
       $paiement->ext_payment_id   = $paiementid;
       $paiement->ext_payment_site = $service;
-      $paiement_id=$paiement->create(DolibarrApiAccess::$user, 1, $this->company);
+      $paiement_id = $paiement->create(DolibarrApiAccess::$user, 1, $this->company);
+      
+	    	if ($paiement_id < 0)
+	        {
+//throw new RestException(500, 'erreur');
+	        }
 }
 
 if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
@@ -953,11 +958,7 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
 
 				$object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
-			}         
-	    	if ($paiement_id < 0)
-	        {
-throw new RestException(500, $paiement->errors);
-	        }
+			}
       
 	    if (!$error && $paiement_id > 0 && ! empty($conf->banque->enabled))
 	    {
@@ -966,7 +967,6 @@ throw new RestException(500, $paiement->errors);
 	        $result=$paiement->addPaymentToBank(DolibarrApiAccess::$user, 'payment', $label, $conf->global->STRIPE_BANK_ACCOUNT_FOR_PAYMENTS, '', '');
 	        if ($result < 0)
 	        {
-	            $msg=$paiement->errors;
 throw new RestException(500, $paiement->errors);
 	        } 
         if (preg_match('/order/', $modulepart) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
