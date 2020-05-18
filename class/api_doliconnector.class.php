@@ -733,7 +733,7 @@ if (! empty($conf->stripe->enabled))
      * 
     * @throws RestException
      */
-    function payObject($modulepart, $item, $paymentmethod, $paymentintent = null, $save = null)
+    function payObject($modulepart, $id, $paymentmethod, $paymentintent = null, $save = null)
     {
     global $langs,$conf;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
