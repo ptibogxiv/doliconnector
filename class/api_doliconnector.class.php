@@ -863,6 +863,7 @@ $ref = $object->ref;
 $currency = $object->multicurrency_code;
 $total = price2num($object->total_ttc - $paiement - $creditnotes - $deposits, 'MT');
 $origin = 'invoice';
+$object2 = $object;
 } else {
 throw new RestException(400, 'Modulepart not supported yet');
 }
@@ -904,12 +905,12 @@ if ($error) {//|| (isset($charge->id) && $charge->statut == 'error')
 $code=$charge->code;
 $error++;
 } elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
-$invoice = new Facture($this->db);
-$idinv=$invoice->createFromOrder($object, DolibarrApiAccess::$user);
+$object2 = new Facture($this->db);
+$idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-  if (!empty($conf->stock->enabled) && $object->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
-	$result=$invoice->validate(DolibarrApiAccess::$user, '', $idwarehouse);
+  if (!empty($conf->stock->enabled) && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+	$result=$object2->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
 // no action if OK
 } else {
@@ -924,7 +925,7 @@ throw new RestException(500, $invoice->error);
       {           
 $datepaye = dol_now();
 $amounts = array(); 
-$amounts[$object->id] = $total;
+$amounts[$object2->id] = $total;
 $multicurrency_amounts=array();
 //$multicurrency_amounts[$item] = $total; 
       // Creation of payment line
@@ -949,15 +950,15 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 			{
 				$outputlangs = $langs;
 				$newlang = '';
-				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object->thirdparty->default_lang;
+				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object2->thirdparty->default_lang;
 				if (! empty($newlang)) {
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
-				$model=$object->modelpdf;
+				$model = $object2->modelpdf;
 				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
 
-				$object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
+				$object2->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
       
 	    if (!$error && $paiement_id > 0 && ! empty($conf->banque->enabled))
