@@ -976,7 +976,7 @@ throw new RestException(500, $paiement->errors);
 	    }          
             return array(
             'charge' => $paiementid,
-            'mode_reglement' => $paymentmethod,
+            'mode_reglement_code' => $paymentmethod,
             'status' => $object->statut,
             'reference' => $object->ref
         );
