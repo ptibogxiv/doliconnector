@@ -800,16 +800,18 @@ $paymentmethod=$src->id;
 } 
 
 if ($src->type == 'card') {
-$mode_reglement_id = dol_getIdFromCode($this->db, 'CB', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_code = 'CB';
 } elseif ($src->type == 'sepa_debit') {
-$mode_reglement_id = dol_getIdFromCode($this->db, 'PRE', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_code = 'PRE';
 } elseif ($src->type == 'ideal') {
-$mode_reglement_id = dol_getIdFromCode($this->db, 'VAD', 'c_paiement', 'code', 'id', 1);
+$mode_reglement_code = 'VAD';
 } else {
-$mode_reglement_id = dol_getIdFromCode($this->db, $paymentmethod, 'c_paiement', 'code', 'id', 1);
-if ($mode_reglement_id <= 0) {
-throw new RestException(404, 'payment method '.$paymentmethod.' not found');
+$mode_reglement_code = $paymentmethod;
 }
+
+$mode_reglement_id = dol_getIdFromCode($this->db, $mode_reglement_code, 'c_paiement', 'code', 'id', 1);
+if ($mode_reglement_id <= 0) {
+throw new RestException(404, 'payment method '.$mode_reglement_code.' or '.$paymentmethod.' not found');
 }
 
 if (preg_match('/order/', $modulepart)) {
@@ -980,7 +982,7 @@ throw new RestException(500, $paiement->errors);
 	    }          
             return array(
             'charge' => $paiementid,
-            'mode_reglement_code' => $paymentmethod,
+            'mode_reglement_code' => $mode_reglement_code,
             'status' => $object->statut,
             'ref' => $object->ref
         );
