@@ -818,7 +818,7 @@ if (preg_match('/order/', $modulepart)) {
 $object=new Commande($this->db);
 $result = $object->fetch($id);
 		if (!$result) {
-			throw new RestException(404, 'Item not found');
+			throw new RestException(404, 'Order not found');
 		}
 if ($object->statut == 0 && $object->billed != 1) {
 if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
@@ -854,7 +854,7 @@ $origin = 'order';
 $object = new Facture($this->db);
 $result = $object->fetch($id);
 		if (!$result) {
-			throw new RestException(404, 'Item not found');
+			throw new RestException(404, 'Invoice not found');
 		}
 if (!$error && $object->statut == 1 && $object->paye != 1) {
 $object->mode_reglement_id = $mode_reglement_id; 
