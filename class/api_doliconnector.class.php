@@ -817,17 +817,29 @@ throw new RestException(404, 'payment method '.$mode_reglement_code.' or '.$paym
 if (preg_match('/order/', $modulepart)) {
 $object=new Commande($this->db);
 $result = $object->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Order not found');
-		}
+if (!$result) {
+            throw new RestException(404, 'Order not found');
+        }
 if ($object->statut == 0 && $object->billed != 1) {
 if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
-$object->valid(DolibarrApiAccess::$user, $idwarehouse, 0);      
-$object->fetch($id);
+$result = $object->valid(DolibarrApiAccess::$user, $idwarehouse, 0); 
+		if ($result == 0) {
+		    throw new RestException(304, 'Error nothing done. May be object is already validated');
+		}
+		if ($result < 0) {
+		    throw new RestException(500, 'Error when validating Order: '.$object->error);
+		}     
+$result = $object->fetch($id);
+if (!$result) {
+            throw new RestException(404, 'Order not found');
+        }
 }
 if (!$error && $object->statut == 1 && $object->billed != 1) {
 $object->mode_reglement_id = $mode_reglement_id; 
-$object->update(DolibarrApiAccess::$user, 1);
+$result = $object->update(DolibarrApiAccess::$user, 1);
+if (!$result) {
+            throw new RestException(500, $object->error);
+        }
 } else {
 throw new RestException(400, 'Order already billed');
 }
@@ -853,12 +865,15 @@ $origin = 'order';
 } elseif (preg_match('/invoice/', $modulepart)) {
 $object = new Facture($this->db);
 $result = $object->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Invoice not found');
-		}
+if (!$result) {
+            throw new RestException(404, 'Invoice not found');
+        }
 if (!$error && $object->statut == 1 && $object->paye != 1) {
 $object->mode_reglement_id = $mode_reglement_id; 
-$object->update(DolibarrApiAccess::$user, 1);
+$result = $object->update(DolibarrApiAccess::$user, 1);
+if (!$result) {
+            throw new RestException(500, $object->error);
+        }
 } else {
 throw new RestException(400, 'Invoice already paid');
 }
