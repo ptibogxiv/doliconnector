@@ -997,6 +997,7 @@ throw new RestException(500, $paiement->errors);
 	    }          
             return array(
             'charge' => $paiementid,
+            'charge_status' => !empty($charge->status)?$charge->status:'pending',
             'mode_reglement_id' => $mode_reglement_id,
             'mode_reglement_code' => $mode_reglement_code,
             'status' => $object->statut,
