@@ -903,11 +903,11 @@ $stripecu = $stripe->getStripeCustomerAccount($this->company->id, $servicestatus
 if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
       $charge = $stripe->createPaymentStripe($total, $currency, $origin, $id, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
       $paiementid = $charge->id;
-} elseif ($id > 0 && preg_match('/pi_/', $paymentmethod)) {
+} elseif ($id > 0 && preg_match('/pi_/', $paymentintent)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
-    	$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod");
+    	$charge = \Stripe\PaymentIntent::retrieve("$paymentintent");
 		} else {
-			$charge = \Stripe\PaymentIntent::retrieve("$paymentmethod", array("stripe_account" => $stripeacc));
+			$charge = \Stripe\PaymentIntent::retrieve("$paymentintent", array("stripe_account" => $stripeacc));
 		}
       $paiementid = $paymentmethod;
 } elseif ($id > 0 && preg_match('/pm_/', $paymentmethod)) {
@@ -997,7 +997,7 @@ throw new RestException(500, $paiement->errors);
 	    }          
             return array(
             'charge' => $paiementid,
-            'charge_status' => !empty($charge->status)?$charge->status:'pending',
+            'charge_status' => $charge->status,
             'mode_reglement_id' => $mode_reglement_id,
             'mode_reglement_code' => $mode_reglement_code,
             'status' => $object->statut,
