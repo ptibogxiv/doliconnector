@@ -978,7 +978,7 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 					$outputlangs->setDefaultLang($newlang);
 				}
 				
-				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
+				$ret = $object2->fetch($invoice->id); // Reload to get new records
         $modelpdf = !empty($object2->modelpdf)?$object2->modelpdf:$conf->global->FACTURE_ADDON_PDF;
 				$object2->generateDocument($modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
