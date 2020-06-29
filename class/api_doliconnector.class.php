@@ -855,7 +855,8 @@ throw new RestException(400, 'Order already billed');
 				}
 
 				$ret = $object->fetch($id); // Reload to get new records
-				$object->generateDocument($object->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
+        $modelpdf = !empty($object->modelpdf)?$object->modelpdf:$conf->global->COMMANDE_ADDON_PDF;
+				$object->generateDocument($modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 				}
         
 $ref = $object->ref;
@@ -976,10 +977,10 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
-				$model = $object2->modelpdf;
+				
 				//$ret = $invoice->fetch($invoice->id); // Reload to get new records
-
-				$object2->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
+        $modelpdf = !empty($object2->modelpdf)?$object2->modelpdf:$conf->global->FACTURE_ADDON_PDF;
+				$object2->generateDocument($modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
       
 	    if (!$error && $paiement_id > 0 && ! empty($conf->banque->enabled))
