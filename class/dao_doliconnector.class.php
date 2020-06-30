@@ -181,10 +181,9 @@ return json_decode($response);
 
         $sql = "SELECT t.rowid";
         $sql .= " FROM ".MAIN_DB_PREFIX."commande as t";
-
-        $sql .= ' WHERE t.entity IN ('.getEntity('commande').')';
-        $sql .= " AND t.date_valid IS NULL"; // Join for the needed table to filter by sale     
-        $sql .= " AND t.fk_statut = 0"; // Join for the needed table to filter by sale
+        $sql .= ' WHERE ';//t.entity IN ('.getEntity('commande').') AND';
+        $sql .= " t.date_valid IS NULL AND"; // Join for the needed table to filter by sale     
+        $sql .= " t.fk_statut = 0"; // Join for the needed table to filter by sale
         if ($doliconnect) $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
 
         dol_syslog("API Rest request");
