@@ -739,7 +739,7 @@ if (! empty($conf->stripe->enabled))
      */
     function payObject($modulepart, $id, $paymentmethod, $paymentintent = null, $save = null)
     {
-    global $langs,$conf;
+    global $langs, $conf, $hookmanager;
       if(! DolibarrApiAccess::$user->rights->societe->creer) {
         throw new RestException(401);
       }
@@ -845,6 +845,8 @@ throw new RestException(400, 'Order already billed');
 }
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
 				{
+        $hookmanager->initHooks(array('ordercard', 'globalcard'));
+        
 				// Define output language
 				$outputlangs = $langs;
 				$newlang = '';
@@ -970,6 +972,8 @@ $multicurrency_amounts=array();
 
 if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
 			{
+        $hookmanager->initHooks(array('invoicecard', 'globalcard'));
+      
 				$outputlangs = $langs;
 				$newlang = '';
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object2->thirdparty->default_lang;
