@@ -34,9 +34,12 @@ $path=dirname(__FILE__).'/';
 /**
  *  Class of triggers for ticketsup module
  */
-class Interfacedoliconnector
+class Interfacedoliconnector extends DolibarrTriggers
 {
-    public $db;
+    /**
+     * @var DoliDB Database handler
+     */
+    protected $db;
 
     /**
      *   Constructor
