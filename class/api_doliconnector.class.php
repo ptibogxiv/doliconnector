@@ -241,8 +241,6 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
       
 $amount_discount=$this->company->getAvailableDiscounts();
 
-$list = array();
-
 $infothirdparty =array(
 						"email" => $this->company->email,
 						"countrycode" => $this->company->country_code
