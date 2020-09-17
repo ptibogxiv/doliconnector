@@ -31,7 +31,7 @@ dol_include_once('/doliconnector/lib/doliconnector.lib.php');
 
 global $db, $langs, $user;
   
-$langs->loadLangs(array("companies", "commercial", "customers", "suppliers", "banks", "doliconnector@doliconnector"));
+$langs->loadLangs(array("companies", "commercial", "customers", "suppliers", "banks", "users", "doliconnector@doliconnector"));
 
 // Security check
 $action	= GETPOST('action');
@@ -39,6 +39,16 @@ $socid = GETPOST('socid', 'int');
 $confirm	= GETPOST('confirm');
 if ($user->societe_id) $socid=$user->societe_id;
 $result = restrictedArea($user, 'societe','','');
+
+$limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
+$rowid = GETPOST("rowid", 'alpha');
+$sortfield = GETPOST("sortfield", 'alpha');
+$sortorder = GETPOST("sortorder", 'alpha');
+$page = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+if (empty($page) || $page == -1) { $page = 0; }     // If $page is not defined, or '' or -1
+$offset = $limit * $page;
+$pageprev = $page - 1;
+$pagenext = $page + 1;
 
 /*
  *	Actions
@@ -238,12 +248,32 @@ print $langs->trans("NoSync");
 		/*
 		 * Liste
 		 *
-		 */
+		 */ 
 
-		$langs->load("users");
-		$title=$langs->trans("ListOfUsers");
+  $pagew = $page+1;
+  $wordpress=new Daodoliconnector($db);
+  $result=$wordpress->doliconnectSync('GET', '/users/?context=edit&per_page='.$limit.'&page='.$pagew, null); 
+	$num = count($result)+1;
+	$totalnboflines = '';
 
-			print load_fiche_titre($title);
+	$param = '';
+	//if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
+	if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
+	$param .= '&socid='.$socid;
+	$moreforfilter = '';
+
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'">';
+    if ($optioncss != '') print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
+    print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
+    print '<input type="hidden" name="action" value="list">';
+    print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
+    print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
+    print '<input type="hidden" name="page" value="'.$page.'">';
+  
+  $title=$langs->trans("ListOfUsers");
+
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, '', $num, $totalnboflines, 'user', 0, '', '', $limit);
 
 			// Lignes des titres
 			print '<table class="noborder" width="100%">';
@@ -254,8 +284,7 @@ print $langs->trans("NoSync");
 			print '<td>&nbsp;</td>';
       print '<td>&nbsp;</td>';
 			print "</tr>\n";
-$wordpress=new Daodoliconnector($db);
-$result=$wordpress->doliconnectSync('GET', '/users/?context=edit&per_page=100', null); 
+
 //print $result;
 if ($result) {     
 foreach ($result as $user ) { 
@@ -291,6 +320,6 @@ print '</td></tr>'."\n";
 //		}
     
 	}
-
+// End of page
 llxFooter();
 $db->close();
