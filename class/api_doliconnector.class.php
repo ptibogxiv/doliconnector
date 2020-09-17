@@ -72,7 +72,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         $user = DolibarrApiAccess::$user;
 
         $doliconnector = new Daodoliconnector($this->db);
-        $fk_soc = $doliconnector->getThirparty($id, '1');
+        $fk_soc = $doliconnector->getThirdparty($id, '1');
         $doliconnector = new Daodoliconnector($this->db);
         $societeaccount = new SocieteAccount($this->db);
         $wdpr = $societeaccount->getCustomerAccount($fk_soc, 'wordpress', '1');
