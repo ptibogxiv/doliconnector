@@ -47,7 +47,7 @@ class Daodoliconnector extends CommonObject
 	 * @return int			<0 if KO, >0 if OK
 	 */
   
-  public function getThirparty($id, $status=0)
+  public function getThirdparty($id, $status=0)
 	{
 		$sql = "SELECT sa.fk_soc as fk_soc, sa.entity";
 		$sql.= " FROM " . MAIN_DB_PREFIX . "societe_account as sa";
