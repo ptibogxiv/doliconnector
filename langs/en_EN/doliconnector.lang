@@ -1,0 +1,25 @@
+# Dolibarr language file - Source file is en_US - paypal
+
+# Module label 'ModuleXXXName'
+Module431310Name = Doliconnect
+# Module description 'ModuleXXXDesc'
+Module431300Desc =  Module for sync Dolibarr with Wordpress
+
+
+doliconnectSetup=Configuration du module Doliconnect
+PayplugDesc=Ce module permet d'offrir une page de paiement via le prestataire <a href="http://www.payplug.fr" target="_blank">PayPlug</a> pour réaliser un paiement quelconque ou un paiement par rapport à un objet Dolibarr (facture, commande…)
+
+LinkedToWordpress=ID Wordpress
+LinkedToWordpressDesc=Liaison du Tiers avec un utilisateur Wordpress permettant la synchronisation Dolibarr<->Wordpress
+NoSync=Pas d'utilisateur synchronisé
+LinkSync=Synchroniser
+Sync=Synchronisé avec ce compte
+SyncSuccess=Liaison avec l'utilisateur réalisée avec succès
+DelSuccess=Liaison avec l'utilisateur supprimée avec succès
+SyncError=Liaison avec l'utilisateur non réalisée
+AlreadySync=Utilisateur déjà synchronisé
+FavoriteSync=Utilisateur recommandé pour la synchronisation
+AutomaticUserAssign=Utilisateur automatic pour assignation
+doliconnect_PARAMETER=Paramètres API REST doliconnect
+CreateUserWordpress=Créer et lier un utilisateur Wordpress
+CreateUserWordpressInfo=Cette action va créer un utilisateur sur votre site wordpress lié à ce tiers. Il va recevoir un email afin de créer son mot de passe. Les informations seront ensuiite synchronisées.
