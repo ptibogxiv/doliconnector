@@ -154,7 +154,7 @@ return json_decode($response);
 	public function DeleteExpiredBasket($secondbeforedelete = '3600', $doliconnect = 1)
 	{
 
-        global $conf, $langs, $user;
+        global $mc, $conf, $langs, $user;
 
         $this->output = '';
         $this->error='';
@@ -179,16 +179,16 @@ return json_decode($response);
         dol_syslog(__METHOD__, LOG_DEBUG);
         require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
-        $sql = "SELECT t.rowid";
+        $sql = "SELECT t.rowid, t.entity";
         $sql .= " FROM ".MAIN_DB_PREFIX."commande as t";
         $sql .= ' WHERE ';//t.entity IN ('.getEntity('commande').') AND';
         $sql .= " t.date_valid IS NULL AND"; // Join for the needed table to filter by sale     
-        $sql .= " t.fk_statut = 0"; // Join for the needed table to filter by sale
-        if ($doliconnect) $sql .= " AND t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
+        $sql .= " t.fk_statut = 0 AND"; // Join for the needed table to filter by sale
+        if ($doliconnect) $sql .= " t.module_source = 'doliconnect'"; // Join for the needed table to filter by sale
 
         dol_syslog("API Rest request");
         $result = $this->db->query($sql);
-
+        $oldentity = $conf->entity;
         if ($result)
         {
             $num = $this->db->num_rows($result);
@@ -196,18 +196,25 @@ return json_decode($response);
             $i = 0;
             while ($i < $min)
             {
-                $obj = $this->db->fetch_object($result);
+      $obj = $this->db->fetch_object($result);
+      
+      if (!empty($conf->multicompany->enabled) && is_object($mc)) {
+      $ret = $mc->switchEntity($obj->entity);
+      }
+
                 $commande_static = new Commande($this->db);
                 if ($commande_static->fetch($obj->rowid)) {
                     // Add external contacts ids
                 if ($commande_static->date_modification < (dol_now()-$secondbeforedelete)) {
-                $result2 = $commande_static->delete($user, 0);		
+                $result2 = 1;//$commande_static->delete($user, 0);		
                 if (!empty($result2)) { $nbok++; }
                 }    
 
                 }
+            
             $i++;
             }
+                         
 			$this->output = 'Found '.($i).' draft orders.';
 			$this->output .= ' Delete '.$nbok.' draft orders';
         }
@@ -218,7 +225,9 @@ return json_decode($response);
         //if (!$i) {
         //    $this->output .= "No draft order to delete found\n";
         //}
-
+      if ($conf->entity != $oldentity) {
+      $ret = $mc->switchEntity(1);
+      }
 		return 0;
 	} 
   
