@@ -214,9 +214,11 @@ return json_decode($response);
             
             $i++;
             }
-                         
+      if ($conf->entity != $oldentity) {
+      $ret = $mc->switchEntity(1);
+      }                         
 			$this->output = 'Found '.($i).' draft orders.';
-			$this->output .= ' Delete '.$nbok.' draft orders';
+			$this->output .= ' Delete '.$nbok.' draft orders';  
         }
         else {
             dol_syslog(__METHOD__.': Error when retrieve order list', LOG_ERR);
@@ -225,9 +227,7 @@ return json_decode($response);
         //if (!$i) {
         //    $this->output .= "No draft order to delete found\n";
         //}
-      if ($conf->entity != $oldentity) {
-      $ret = $mc->switchEntity(1);
-      }
+
 		return 0;
 	} 
   
