@@ -154,11 +154,11 @@ return json_decode($response);
 	public function DeleteExpiredBasket($secondbeforedelete = '3600', $doliconnect = 1)
 	{
 
-        global $mc, $conf, $langs, $user;
+        global $conf, $langs, $user, $mc;
 
         $this->output = '';
         $this->error='';
-
+        $oldentity = (!empty($conf->entity)? $conf->entity : 1);
 		$now = dol_now();
 		$nbok = 0;
 		$nbko = 0;
@@ -188,7 +188,7 @@ return json_decode($response);
 
         dol_syslog("API Rest request");
         $result = $this->db->query($sql);
-        $oldentity = $conf->entity;
+
         if ($result)
         {
             $num = $this->db->num_rows($result);
@@ -198,7 +198,7 @@ return json_decode($response);
             {
       $obj = $this->db->fetch_object($result);
       
-      if (!empty($conf->multicompany->enabled) && is_object($mc)) {
+      if (!empty($conf->multicompany->enabled) && is_object($mc) && $obj->entity != $conf->entity) {
       $ret = $mc->switchEntity($obj->entity);
       }
 
@@ -215,7 +215,7 @@ return json_decode($response);
             $i++;
             }
       if ($conf->entity != $oldentity) {
-      $ret = $mc->switchEntity(1);
+      $ret = $mc->switchEntity($oldentity);
       }                         
 			$this->output = 'Found '.($i).' draft orders.';
 			$this->output .= ' Delete '.$nbok.' draft orders';  
