@@ -206,7 +206,7 @@ return json_decode($response);
                 if ($commande_static->fetch($obj->rowid)) {
                     // Add external contacts ids
                 if ($commande_static->date_modification < (dol_now()-$secondbeforedelete)) {
-                $result2 = 1;//$commande_static->delete($user, 0);		
+                $result2 = $commande_static->delete($user, 0);		
                 if (!empty($result2)) { $nbok++; }
                 }    
 
