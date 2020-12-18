@@ -71,13 +71,17 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         global $user,$conf;     
         $user = DolibarrApiAccess::$user;
 
+        if ( $id <= 0  ) {
+            throw new RestException(404, 'wordpress #'.$id.' not found');
+        }
+
         $doliconnector = new Daodoliconnector($this->db);
         $fk_soc = $doliconnector->getThirdparty($id, '1');
         $doliconnector = new Daodoliconnector($this->db);
         $societeaccount = new SocieteAccount($this->db);
         $wdpr = $societeaccount->getCustomerAccount($fk_soc, 'wordpress', '1');
         
-        if ( ! $wdpr ) {
+        if ( ! $wdpr  ) {
             throw new RestException(404, 'wordpress #'.$id.' not found');
         }
 	$this->company->fetch($fk_soc);
@@ -192,26 +196,6 @@ $trainee = $this->db->fetch_object($result);
             'fk_order_nb_item' => $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($this->company->id))
 
         );
-    }
-    
-     /**
-     * Get constante of an entity
-     *
-     * Return an array with entity informations
-     *
-     * @param     string     $id ID of entity
-     * @return    array|mixed data without useless information
-     *
-     * @throws    RestException
-     */
-    function getConstante($id)
-    {
-        global $conf;
-        
-      if(!DolibarrApiAccess::$user->admin) {
-        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-      }  
-        return array("value" => $conf->global->$id);
     } 
     
     /**
@@ -229,6 +213,10 @@ $trainee = $this->db->fetch_object($result);
     {
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
+
+        if ( $id <= 0  ) {
+            throw new RestException(404, 'wordpress #'.$id.' not found');
+        }
 
     $result = $this->company->fetch($id);
       if( ! $result && $id != '0' ) {
