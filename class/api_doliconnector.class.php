@@ -315,7 +315,6 @@ $stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_co
 $infostripe['client_secret'] = $stripeClientSecret->client_secret;
 
 if ( $listofpaymentmethods1 != null ) { 
-
 foreach ( $listofpaymentmethods1 as $src ) {
 
 $list[$src->id]['id'] = $src->id;
@@ -332,10 +331,9 @@ if ( ($stripecu->invoice_settings->default_payment_method != $src->id) ) { $defa
 
 $list[$src->id]['default_source']= $default;
 
-} }
+}}
 
 if ( $listofpaymentmethods2 != null ) {
-
 foreach ( $listofpaymentmethods2 as $src ) {
 
 $list[$src->id]['id'] = $src->id;
@@ -361,7 +359,7 @@ if ( ($stripecu->invoice_settings->default_payment_method != $src->id) ) { $defa
 
 $list[$src->id]['default_source']= $default;
 
-} }
+}}
  
 if ( $listofpaymentmethods3 != null ) {
 
