@@ -306,7 +306,7 @@ if ($type == 'order')
 	$fulltag=dol_string_unaccent($fulltag);  
 }
 if ($object->id > 0) {  
-$stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus);
+$stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_code, $tag, 'Stripe payment: '.$fulltag.(is_object($object)?' ref='.$object->ref:''), $object, $stripecu, $stripeacc, $servicestatus, 1, 'automatic', true, null, 1);
 } else {
           throw new RestException(404, 'Object '.$type.' id='.$rowid.' not found');
 }
