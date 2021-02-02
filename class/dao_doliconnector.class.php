@@ -159,7 +159,7 @@ return json_decode($response);
         $this->output = '';
         $this->error='';
         $oldentity = (!empty($conf->entity)? $conf->entity : 1);
-		$now = dol_now();
+		$now = dol_now('gmt');
 		$nbok = 0;
 		$nbko = 0;
     
@@ -205,7 +205,7 @@ return json_decode($response);
                 $commande_static = new Commande($this->db);
                 if ($commande_static->fetch($obj->rowid)) {
                     // Add external contacts ids
-                if ($commande_static->date_modification < (dol_now()-$secondbeforedelete)) {
+                if ($commande_static->date_modification < ($now-$secondbeforedelete)) {
                 $result2 = $commande_static->delete($user, 0);		
                 if (!empty($result2)) { $nbok++; }
                 }    
