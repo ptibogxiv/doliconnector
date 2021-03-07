@@ -827,6 +827,7 @@ if (!$result) {
 } else {
 throw new RestException(400, 'Order already billed');
 }
+
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
 				{
         $hookmanager->initHooks(array('ordercard', 'globalcard'));
