@@ -806,6 +806,7 @@ if (!$result) {
         }
 if ($object->statut == 0 && $object->billed != 1) {
 if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+$object->send_mail = 'on';
 $result = $object->valid(DolibarrApiAccess::$user, $idwarehouse, 0); 
 		if ($result == 0) {
 		    throw new RestException(304, 'Error nothing done. May be object is already validated');
@@ -919,7 +920,8 @@ $idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
   if (!empty($conf->stock->enabled) && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
-	$result=$object2->validate(DolibarrApiAccess::$user, '', $idwarehouse);
+	$object2->send_mail = 'on';
+  $result=$object2->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
 // no action if OK
 } else {
