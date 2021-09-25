@@ -223,7 +223,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
           throw new RestException(404, 'Thirdparty not found');
       } 
       
-      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id) && $id != '0' ) {
+      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id) && !empty($id) ) {
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
       
@@ -276,7 +276,7 @@ if ($stripecu->id) {
 $listofpaymentmethods3 = $stripecu->sources->data;
 }
 
-if ( empty($type) && empty($rowid) && $id != '0' ) {
+if ( empty($type) && empty($rowid) && !empty($id) ) {
 //$stripeSetupIntent = \Stripe\SetupIntent::create([
 //  'payment_method_types' => array('card', 'sepa_debit'),
 //]);
