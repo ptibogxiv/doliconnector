@@ -426,6 +426,7 @@ $chq=$bank;
 }
 }
 
+if ($result) {
 $rib_list = $this->company->get_all_rib();
 if (is_array($rib_list)) {
 		foreach ($rib_list as $rib)
@@ -449,6 +450,7 @@ $list[$rib->id]['date_creation'] =  $rib->datec;
 $list[$rib->id]['expiration'] =  null;
 $list[$rib->id]['country'] = substr($rib->iban, 0, 2);
 $list[$rib->id]['default_source'] = $rib->default_rib;
+}
 }
 }
 
