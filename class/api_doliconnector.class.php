@@ -934,7 +934,7 @@ throw new RestException(500, $invoice->error);
 } 
 }
 
-      if (!$error)
+      if (!$error && !empty($total) )
       {           
 $datepaye = dol_now();
 $amounts = array(); 
