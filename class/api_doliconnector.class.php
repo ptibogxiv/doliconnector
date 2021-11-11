@@ -408,6 +408,15 @@ $infostripe['types'][] = "sepa_debit";
 if (!empty($conf->global->STRIPE_IDEAL) && $this->company->country_code == 'NL') {
 $infostripe['types'][] = "ideal";
 }
+if (!empty($conf->global->STRIPE_KLARNA) ) { //} && $this->company->country_code == 'NL')
+$infostripe['types'][] = "klarna";
+}
+if (!empty($conf->global->STRIPE_SOFORT) ) { //} && $this->company->country_code == 'NL')
+$infostripe['types'][] = "sofort";
+}
+if (!empty($conf->global->STRIPE_BANCONTACT) ) { //} && $this->company->country_code == 'NL')
+$infostripe['types'][] = "bancontact";
+}
 
 }
  
