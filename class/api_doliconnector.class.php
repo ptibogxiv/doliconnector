@@ -800,6 +800,8 @@ $mode_reglement_code = 'CB';
 $mode_reglement_code = 'PRE';
 } elseif ($src->type == 'ideal') {
 $mode_reglement_code = 'VAD';
+} elseif ($src->type == 'klarna') {
+$mode_reglement_code = 'CB';
 } else {
 $mode_reglement_code = $paymentmethod;
 }
