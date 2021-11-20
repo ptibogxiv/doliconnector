@@ -794,7 +794,7 @@ $paymentmethod=$src->id;
 }
 } 
 
-if ($src->type == 'card') {
+if ($src->type == 'card' || $src->type == 'card_present') {
 $mode_reglement_code = 'CB';
 } elseif ($src->type == 'sepa_debit') {
 $mode_reglement_code = 'PRE';
