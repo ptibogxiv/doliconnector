@@ -83,15 +83,17 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
 			throw new RestException(403, 'Error API open to admin users only or to the users with logins defined into constant API_LOGINS_ALLOWED_FOR_CONST_READ');
 		}
 
-		//if (!preg_match('/^[a-zA-Z0-9_]+$/', $constantname) || !isset($langs->transcountry($constantname, $country_code))) {
-		//	throw new RestException(404, 'Error Bad or unknown value for constantname');
-		//}
-		//if (isASecretKey($constantname)) {
-		//	throw new RestException(403, 'Forbidden. This parameter cant be read with APIs');
-		//}
     $langs = new Translate('', $conf);
     $langs->setDefaultLang($langcode);
     $langs->load($filename);
+
+		if (!preg_match('/^[a-zA-Z0-9_]+$/', $constantname)) {
+			throw new RestException(404, 'Error Bad or unknown value for constantname');
+    }
+		//if (isASecretKey($constantname)) {
+		//	throw new RestException(403, 'Forbidden. This parameter cant be read with APIs');
+		//}
+
 
 		return $langs->trans($constantname);
 	}
