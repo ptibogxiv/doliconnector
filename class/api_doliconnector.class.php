@@ -37,7 +37,10 @@ class doliconnector extends DolibarrApi
 dol_include_once('/doliconnector/class/dao_doliconnector.class.php'); 
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/ccountry.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/translate.class.php';
 require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
@@ -54,7 +57,44 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         $this->company = new Societe($this->db);
         $this->invoice = new Facture($this->db);
   
-    }   
+    }  
+    
+	/**
+	 * Get translation of a variable
+	 *
+	 * Note that conf variables that stores security key or password hashes can't be loaded with API.
+	 *
+	 * @param	string			$constantname	Name of variable to translate
+	 * @param	string			$filename	Name of loading file for translate
+	 * @param	string			$langcode	Code of language for translate ie: en_US
+	 * @return  array|mixed 				Data without useless information
+	 *
+	 * @url     GET translation/{constantname}
+	 *
+	 * @throws RestException 403 Forbidden
+	 * @throws RestException 404 Error Bad or unknown value for constantname
+	 */
+	public function getTranslate($constantname, $filename, $langcode = '')
+	{
+    global $conf;
+
+		if (!DolibarrApiAccess::$user->admin
+			&& (empty($conf->global->API_LOGINS_ALLOWED_FOR_CONST_READ) || DolibarrApiAccess::$user->login != $conf->global->API_LOGINS_ALLOWED_FOR_CONST_READ)) {
+			throw new RestException(403, 'Error API open to admin users only or to the users with logins defined into constant API_LOGINS_ALLOWED_FOR_CONST_READ');
+		}
+
+		//if (!preg_match('/^[a-zA-Z0-9_]+$/', $constantname) || !isset($langs->transcountry($constantname, $country_code))) {
+		//	throw new RestException(404, 'Error Bad or unknown value for constantname');
+		//}
+		//if (isASecretKey($constantname)) {
+		//	throw new RestException(403, 'Forbidden. This parameter cant be read with APIs');
+		//}
+    $langs = new Translate('', $conf);
+    $langs->setDefaultLang($langcode);
+    $langs->load($filename);
+
+		return $langs->trans($constantname);
+	}
 
     /**
      * Get properties of an thirparty / wordpress's user
