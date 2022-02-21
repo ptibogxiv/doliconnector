@@ -113,7 +113,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         global $user,$conf;     
         $user = DolibarrApiAccess::$user;
 
-        if ( $id <= 0  ) {
+        if ( $id <= '0' ) {
             throw new RestException(404, 'wordpress #'.$id.' not found');
         }
 
@@ -836,13 +836,13 @@ $paymentmethod=$src->id;
 }
 } 
 
-if ($src->type == 'card' || $src->type == 'card_present') {
+if (isset($src->type) && ($src->type == 'card' || $src->type == 'card_present')) {
 $mode_reglement_code = 'CB';
-} elseif ($src->type == 'sepa_debit') {
+} elseif (isset($src->type) && $src->type == 'sepa_debit') {
 $mode_reglement_code = 'PRE';
-} elseif ($src->type == 'ideal') {
+} elseif (isset($src->type) && $src->type == 'ideal') {
 $mode_reglement_code = 'VAD';
-} elseif ($src->type == 'klarna') {
+} elseif (isset($src->type) && $src->type == 'klarna') {
 $mode_reglement_code = 'CB';
 } else {
 $mode_reglement_code = $paymentmethod;
