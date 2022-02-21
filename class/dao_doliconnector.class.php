@@ -192,7 +192,7 @@ return json_decode($response);
         if ($result)
         {
             $num = $this->db->num_rows($result);
-            $min = min($num, $num));
+            $min = min($num, $num);
             $i = 0;
             while ($i < $min)
             {
