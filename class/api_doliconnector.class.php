@@ -117,6 +117,8 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
             throw new RestException(404, 'wordpress #'.$id.' not found');
         }
 
+        $array = array();
+
         $doliconnector = new Daodoliconnector($this->db);
         $fk_soc = $doliconnector->getThirdparty($id, '1');
         $doliconnector = new Daodoliconnector($this->db);
