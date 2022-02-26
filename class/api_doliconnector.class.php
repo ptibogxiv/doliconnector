@@ -302,7 +302,7 @@ $infostripe['publishable_key'] = $publishable_key;
 $infostripe['account'] = $stripeacc;
 $infostripe['types'] = array("card");
                                                                                                
-if ($stripecu->id) {
+if (isset($stripecu->id) &&!empty($stripecu->id)) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $stripecu, 'card', $stripeacc, $servicestatus);
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$listofpaymentmethods1 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "card"));
