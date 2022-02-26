@@ -255,18 +255,18 @@ $trainee = $this->db->fetch_object($result);
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
-        if ( $id < 0  ) {
-            throw new RestException(404, 'wordpress #'.$id.' not found');
-        }
+    if ( $id <= 0  ) {
+    throw new RestException(404, 'Thirdparty not found');
+    }
 
     $result = $this->company->fetch($id);
-      if( ! $result && !empty($id) ) {
-          throw new RestException(404, 'Thirdparty not found');
-      } 
+    if( ! $result && !empty($id) ) {
+      throw new RestException(404, 'Thirdparty not found');
+    } 
       
-      if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id) && !empty($id) ) {
-        throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-      }
+    if( ! DolibarrApi::_checkAccessToResource('societe',$this->company->id) && !empty($id) ) {
+      throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+    }
       
 $amount_discount=$this->company->getAvailableDiscounts();
 
