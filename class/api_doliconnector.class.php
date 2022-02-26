@@ -113,58 +113,55 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         global $user,$conf;     
         $user = DolibarrApiAccess::$user;
 
-        if ( $id <= '0' ) {
+        if ( $id <= 0 ) {
             throw new RestException(404, 'wordpress #'.$id.' not found');
         }
 
         $array = array();
 
         $doliconnector = new Daodoliconnector($this->db);
-        $fk_soc = $doliconnector->getThirdparty($id, '1');
+        $array['fk_soc'] = $doliconnector->getThirdparty($id, '1');
+        $array['fk_order'] = $doliconnector->doliconnectorder($array['fk_soc']);
+        $array['fk_order_nb_item'] = $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($array['fk_soc']));   
         $doliconnector = new Daodoliconnector($this->db);
         $societeaccount = new SocieteAccount($this->db);
-        $wdpr = $societeaccount->getCustomerAccount($fk_soc, 'wordpress', '1');
-        
-        if ( ! $wdpr  ) {
+        $wdpr = $societeaccount->getCustomerAccount($array['fk_soc'], 'wordpress', '1');
+ 
+        if ( ! $wdpr && !empty($array['fk_soc'])  ) {
             throw new RestException(404, 'wordpress #'.$id.' not found');
         }
-	$this->company->fetch($fk_soc);
+	$this->company->fetch($array['fk_soc']);
+  $array['outstanding_limit'] = $this->company->outstanding_limit;
+  $array['remise_percent'] = $this->company->remise_percent;
        
   if (! empty($conf->global->PRODUIT_MULTIPRICES))
 {      
-  $price_level=$this->company->price_level;
+  $array['price_level'] = $this->company->price_level;
 } 
   
   if (! empty($conf->adherent->enabled))
 {  
   $member=new Adherent($this->db);
   $member->fetch('','',$this->company->id,'');
+  $array['fk_member'] = $member->id;
+  $array['member_end'] = $member->datefin;
+  $array['fk_user'] = $member->user_id;
 }
 
   if (! empty($conf->agefodd->enabled))
   { 
      $sql = "SELECT s.rowid as rowid, s.fk_soc, s.entity FROM ".MAIN_DB_PREFIX."agefodd_stagiaire as s";        
-     $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '$fk_soc' ";
+     $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '".$array['fk_soc']."' ";
 
 $result = $this->db->query($sql);
 if ($result)
 {
 $trainee = $this->db->fetch_object($result);
-} }
+$array['fk_trainee'] = $trainee->rowid;
+} 
+}
    
-        return array(
-            'fk_soc' => $fk_soc,
-            'price_level' => $price_level,
-            'outstanding_limit' => $this->company->outstanding_limit,
-            'remise_percent' =>  $this->company->remise_percent,
-            'fk_member' => $member->id,
-            'member_end' => $member->datefin,             
-            'fk_trainee' => $trainee->rowid, 
-            'fk_user' => $member->user_id,
-            'fk_order' => $doliconnector->doliconnectorder($fk_soc),
-            'fk_order_nb_item' => $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($fk_soc))
-
-        );
+        return $array;
     }
     
      /**
