@@ -74,7 +74,7 @@ $data = array(
 );
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('POST', '/users/', $data);
-             	 
+//print var_dump($result);             	 
 if ( $result->id > 0 ) {
 					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_account (fk_soc, login, key_account, site, status, entity, date_creation, fk_user_creat)";
 					$sql .= " VALUES (".$socid.", '', '".$result->id."', 'wordpress', '1', " . $conf->entity . ", '".$db->idate(dol_now())."', ".$user->id.")";
@@ -89,8 +89,8 @@ if ( $result->id > 0 ) {
 setEventMessages($langs->trans('SyncSuccess', $langs->trans('SyncSuccess')), null, 'mesgs');
           }
 
-		header("Location: card.php?socid=".$socid);
-		exit;
+		//header("Location: card.php?socid=".$socid);
+		//exit;
 	}
 	else
 	{
@@ -289,7 +289,7 @@ print $langs->trans("NoSync");
 if ($result) {     
 foreach ($result as $user ) { 
 $wordpress->getThirdparty($user->id, '1');
-$wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
+if ($wordpress->fk_soc > 0) $wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
 print "<tr ".$bc[$var]."><td>";
 print $user->name;
 print '</td><td>'.$user->slug.'</td>';
