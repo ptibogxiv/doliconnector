@@ -289,7 +289,7 @@ print $langs->trans("NoSync");
 if ($result) {     
 foreach ($result as $user ) { 
 $wordpress->getThirdparty($user->id, '1');
-if ($wordpress->fk_soc > 0) $wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
+if (isset($wordpress->fk_soc) && $wordpress->fk_soc > 0) $wdpr = $societeaccount->getCustomerAccount($wordpress->fk_soc, 'wordpress', '1');
 print "<tr ".$bc[$var]."><td>";
 print $user->name;
 print '</td><td>'.$user->slug.'</td>';
