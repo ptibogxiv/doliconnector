@@ -93,6 +93,7 @@ class Actionsdoliconnector
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($this->db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
+//$this->resprints.= var_dump($result);
 $this->resprints.= $result->name.' ('.$result->slug.'), '.$result->email;
 
 } else {
