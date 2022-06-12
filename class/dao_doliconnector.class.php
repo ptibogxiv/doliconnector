@@ -86,7 +86,11 @@ public function doliconnectorder($fk_soc)
       if ($resql)
         {
       $num_prods = $this->db->fetch_object($resql);
-      return  $num_prods->rowid;
+      if (isset($num_prods->rowid)) {
+		return $num_prods->rowid;
+	  } else {
+		return 0;
+	  }
         }
       else return -1;
       
