@@ -318,9 +318,6 @@ $listofpaymentmethods3 = $stripecu->sources->data;
 }
 
 if ( empty($type) && empty($rowid) && !empty($id) ) {
-//$stripeSetupIntent = \Stripe\SetupIntent::create([
-//  'payment_method_types' => array('card', 'sepa_debit'),
-//]);
 $stripeClientSecret = $stripe->getSetupIntent(null, null, $stripecu->id, $stripeacc, $servicestatus, false);
 } elseif (!empty($type)) {
 if ($type == 'order')
