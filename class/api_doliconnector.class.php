@@ -255,7 +255,7 @@ $trainee = $this->db->fetch_object($result);
     global $conf, $mysoc;
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
-    if ( $id <= 0  ) {
+    if ( $id < 0  ) {
     throw new RestException(404, 'Thirdparty not found');
     }
 
