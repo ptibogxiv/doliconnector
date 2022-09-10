@@ -48,7 +48,7 @@ if ($action == 'setvalue' && $user->admin)
     if (! $result > 0) $error++;
     $result = dolibarr_set_const($db, "DOLICONNECT_USER_AUTOMATIC", GETPOST('DOLICONNECT_USER_AUTOMATIC','alpha'),'chaine', 0, '', 0);
     if (! $result > 0) $error++;
-    $result = dolibarr_set_const($db, "web", GETPOST('web','alpha'),'chaine', 0, '', $conf->entity);  
+    $result = dolibarr_set_const($db, "MAIN_INFO_SOCIETE_WEB", GETPOST('MAIN_INFO_SOCIETE_WEB','alpha'),'chaine', 0, '', $conf->entity);  
     if (! $result > 0) $error++;
     $result = dolibarr_set_const($db, "DOLICONNECT_USER", GETPOST('DOLICONNECT_USER','alpha'),'chaine', 0, '', 0);
     if (! $result > 0) $error++;
@@ -121,7 +121,7 @@ print '</td></tr>';
 $var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("WordpressUrl").' '.$langs->trans("as").' '.$langs->trans("Web").'</td><td>';
-print '<input size="80" type="text" name="web" id="web" value="'. dol_escape_htmltag($conf->global->MAIN_INFO_SOCIETE_WEB) . '">';
+print '<input size="80" type="text" name="MAIN_INFO_SOCIETE_WEB" id="MAIN_INFO_SOCIETE_WEB" value="'. dol_escape_htmltag($conf->global->MAIN_INFO_SOCIETE_WEB) . '">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
