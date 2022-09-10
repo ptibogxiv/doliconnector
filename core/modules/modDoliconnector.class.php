@@ -48,17 +48,17 @@ class modDoliconnector extends DolibarrModules {
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
 		$this->family = "interface";
-    // Can be enabled / disabled only in the main company with superadmin account
+		// Can be enabled / disabled only in the main company with superadmin account
 		$this->core_enabled = 1;
 		// Module label, used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module doliconnector";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '15.0.3';
+		$this->version = '16.0.0';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
-    $this->editor_name = 'ptibogxiv.net';
-    $this->editor_url = 'https://www.ptibogxiv.net';
+		$this->editor_name = 'ptibogxiv.net';
+		$this->editor_url = 'https://www.ptibogxiv.net';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -69,16 +69,16 @@ class modDoliconnector extends DolibarrModules {
 		$this->picto = 'doliconnector@doliconnector';
 		
     
-    // Dependencies
-    $this->depends = array('modApi');		// List of modules id that must be enabled if this module is enabled
-    $this->requiredby = array();	// List of modules id to disable if this one is disabled
-    $this->phpmin = array(5,6);					// Minimum version of PHP required by module
-    $this->need_dolibarr_version = array(8,0);	// Minimum version of Dolibarr required by module
-    $this->langfiles = array("doliconnector@doliconnector");
+   	 	// Dependencies
+    	$this->depends = array('modApi');		// List of modules id that must be enabled if this module is enabled
+    	$this->requiredby = array();	// List of modules id to disable if this one is disabled
+    	$this->phpmin = array(5,6);					// Minimum version of PHP required by module
+    	$this->need_dolibarr_version = array(8,0);	// Minimum version of Dolibarr required by module
+    	$this->langfiles = array("doliconnector@doliconnector");
 
 
-       // Config pages. Put here list of php page, stored into oblyon/admin directory, to use to setup module.
-    $this->config_page_url = array("doliconnector.php@doliconnector");
+       	// Config pages. Put here list of php page, stored into oblyon/admin directory, to use to setup module.
+	   	$this->config_page_url = array("doliconnector.php@doliconnector");
     
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
@@ -94,8 +94,8 @@ class modDoliconnector extends DolibarrModules {
 				),
 		);
 
-    // Data directories to create when module is enabled
-    $this->dirs = array();
+    	// Data directories to create when module is enabled
+    	$this->dirs = array();
 		// Exports
 		$r=1;
     
