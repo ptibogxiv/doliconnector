@@ -301,7 +301,10 @@ $infostripe['live'] = $servicestatus;
 $infostripe['publishable_key'] = $publishable_key;
 $infostripe['account'] = $stripeacc;
 $infostripe['types'] = array("card");
-                                                                                               
+ 
+$listofpaymentmethods1 = array();
+$listofpaymentmethods2 = array();
+$listofpaymentmethods3 = array();
 if (isset($stripecu->id) &&!empty($stripecu->id)) {
 //$listofpaymentmethods = $stripe->getListOfPaymentMethods($this->company, $stripecu, 'card', $stripeacc, $servicestatus);
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
@@ -350,7 +353,7 @@ $stripeClientSecret=$stripe->getPaymentIntent($amount, $object->multicurrency_co
 }
 }  
 
-$infostripe['client_secret'] = $stripeClientSecret->client_secret;
+$infostripe['client_secret'] = (isset($stripeClientSecret->client_secret)?$stripeClientSecret->client_secret:null);
 
 if ( $listofpaymentmethods1 != null ) { 
 foreach ( $listofpaymentmethods1 as $src ) {
@@ -501,12 +504,13 @@ $list[$rib->id]['default_source'] = $rib->default_rib;
 }
 }
 
-if (! empty($conf->paypal->enabled)) {
 $infopaypal = array();
+if (! empty($conf->paypal->enabled)) {
 $infopaypal['live'] = null;
 $infopaypal['url'] = null;
 }
 
+$public_url = null;
 if (!empty($type) && is_object($object)  && isset($object->ref)) {
 $public_url = getOnlinePaymentUrl(0, $type, $object->ref);
 }  
