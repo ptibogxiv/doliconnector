@@ -120,9 +120,11 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
         $array = array();
 
         $doliconnector = new Daodoliconnector($this->db);
+        if ($id > 0) {
         $array['fk_soc'] = $doliconnector->getThirdparty($id, '1');
         $array['fk_order'] = $doliconnector->doliconnectorder($array['fk_soc']);
-        $array['fk_order_nb_item'] = $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($array['fk_soc']));   
+        $array['fk_order_nb_item'] = $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($array['fk_soc']));
+        }   
         $doliconnector = new Daodoliconnector($this->db);
         $societeaccount = new SocieteAccount($this->db);
         $wdpr = $societeaccount->getCustomerAccount($array['fk_soc'], 'wordpress', '1');
