@@ -37,7 +37,7 @@ $langs->loadLangs(array("companies", "commercial", "customers", "suppliers", "ba
 $action	= GETPOST('action');
 $socid = GETPOST('socid', 'int');
 $confirm	= GETPOST('confirm');
-if ($user->societe_id) $socid=$user->societe_id;
+if (!empty($user->societe_id)) $socid=$user->societe_id;
 $result = restrictedArea($user, 'societe','','');
 
 $limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -177,7 +177,7 @@ if (! empty($socid))
 
     $linkback = '<a href="'.DOL_URL_ROOT.'/societe/list.php">'.$langs->trans("BackToList").'</a>';
 	
-    dol_banner_tab($object, 'socid', $linkback, ($user->societe_id?0:1), 'rowid', 'nom');
+    dol_banner_tab($object, 'socid', $linkback, (!empty($user->societe_id)?0:1), 'rowid', 'nom');
         
 	print '<div class="fichecenter">';
 
