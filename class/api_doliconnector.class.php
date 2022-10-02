@@ -513,7 +513,7 @@ $infopaypal['url'] = null;
 }
 
 $public_url = null;
-if (!empty($type) && is_object($object)  && isset($object->ref)) {
+if (!empty($type) && isset($object) && is_object($object) && isset($object->ref)) {
 $public_url = getOnlinePaymentUrl(0, $type, $object->ref);
 }  
   		return array(
