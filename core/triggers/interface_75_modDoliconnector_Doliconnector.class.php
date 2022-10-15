@@ -142,7 +142,7 @@ $data = array(
 //if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
 
 $result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
-$ok=$result->ok;
+if (isset($result->ok))$ok=$result->ok;
 }
   }
 
@@ -172,7 +172,7 @@ $data = array(
     'url' => trim($object->url),  
 );
 $result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
-$ok=$result->ok;
+if (isset($result->ok))$ok=$result->ok;
 }     
   } 
 }
