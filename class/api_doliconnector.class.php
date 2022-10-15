@@ -279,7 +279,7 @@ $infothirdparty =array(
             
 $list = array();
 
-if (! empty($conf->stripe->enabled)) {
+if (isModEnabled('stripe')) {
 	$service = 'StripeTest';
 	$servicestatus = 0;
   
@@ -487,7 +487,7 @@ if (is_array($rib_list)) {
 		foreach ($rib_list as $rib)
 		{
 $list[$rib->id]['id'] = $rib->id;
-if (!empty($conf->prelevement->enabled))
+if (isModEnabled('prelevement'))
 {
 $list[$rib->id]['type'] = 'PRE';
 $list[$rib->id]['brand'] = 'PRE';
