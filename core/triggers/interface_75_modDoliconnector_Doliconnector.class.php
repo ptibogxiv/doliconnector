@@ -121,7 +121,7 @@ global $db,$conf;
 
 /** Users */
 $ok=0;      
- if ($action == 'COMPANY_MODIFY') {
+if ($action == 'COMPANY_MODIFY') {
 			dol_syslog(
 				"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
 			);
