@@ -146,13 +146,14 @@ $ok=$result->ok;
 }
   }
 
-  } 
+} 
      
- 	if ($action == 'COMPANY_DELETE') {
+if ($action == 'COMPANY_DELETE') {
 //NO ACTION
-		}  
+
+}  
           
- if ($action == 'MEMBER_MODIFY') {
+if ($action == 'MEMBER_MODIFY') {
 			dol_syslog(
 				"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
 			);
@@ -165,10 +166,10 @@ $ok=$result->ok;
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $data = array(
-    'first_name'  => $object->firstname,
-    'last_name'  => $object->lastname,
-    'email' => $object->email,
-    'url' => $object->url, 
+    'first_name'  => trim($object->first_name),
+    'last_name'  => trim($object->lastname),
+    'email' => trim($object->email),
+    'url' => trim($object->url),  
 );
 $result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
 $ok=$result->ok;
@@ -176,10 +177,4 @@ $ok=$result->ok;
   } 
 }
 
- 	if ($action == 'STOCK_MOVEMENT') {
-//NO ACTION
-		}    
-
-		return $ok;
-	}
 }
