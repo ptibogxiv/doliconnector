@@ -464,14 +464,14 @@ $infostripe['types'][] = "bancontact";
 }
  
 $vir = null;
-if (isset(getDolGlobalInt('FACTURE_RIB_NUMBER'))) {
+if (getDolGlobalInt('FACTURE_RIB_NUMBER')) {
 $bank = new Account($this->db);
 $bank->fetch(getDolGlobalInt('FACTURE_RIB_NUMBER'));
 $vir = $bank;
 }
 
 $chq = null;
-if (isset(getDolGlobalInt('FACTURE_CHQ_NUMBER'))) {
+if (getDolGlobalInt('FACTURE_CHQ_NUMBER')) {
 if (getDolGlobalInt('FACTURE_CHQ_NUMBER')=='-1'){
 $chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address);
 } else {
