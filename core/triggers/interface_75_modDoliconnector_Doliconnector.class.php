@@ -166,7 +166,7 @@ if ($action == 'MEMBER_MODIFY') {
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $data = array(
-    'first_name'  => trim($object->first_name),
+    'first_name'  => trim($object->firstname),
     'last_name'  => trim($object->lastname),
     'email' => trim($object->email),
     'url' => trim($object->url),  
