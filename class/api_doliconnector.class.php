@@ -463,17 +463,17 @@ $infostripe['types'][] = "bancontact";
 
 }
  
-if ($conf->global->FACTURE_RIB_NUMBER){
+if (isset(getDolGlobalInt('FACTURE_RIB_NUMBER'))) {
 $bank = new Account($this->db);
-$bank->fetch($conf->global->FACTURE_RIB_NUMBER);
+$bank->fetch(getDolGlobalInt('FACTURE_RIB_NUMBER'));
 $vir=$bank;
 }
-if ($conf->global->FACTURE_CHQ_NUMBER){
-if ($conf->global->FACTURE_CHQ_NUMBER=='-1'){
+if (isset(getDolGlobalInt('FACTURE_CHQ_NUMBER'))) {
+if (getDolGlobalInt('FACTURE_CHQ_NUMBER')=='-1'){
 $chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address);
 } else {
 $bank = new Account($this->db);
-$bank->fetch($conf->global->FACTURE_CHQ_NUMBER);
+$bank->fetch(getDolGlobalInt('FACTURE_CHQ_NUMBER'));
 $chq=$bank;
 }
 }
