@@ -467,7 +467,7 @@ $vir = null;
 if (isset(getDolGlobalInt('FACTURE_RIB_NUMBER'))) {
 $bank = new Account($this->db);
 $bank->fetch(getDolGlobalInt('FACTURE_RIB_NUMBER'));
-$vir=$bank;
+$vir = $bank;
 }
 
 $chq = null;
@@ -477,7 +477,7 @@ $chq=array('proprio' => $bank->proprio, 'owner_address' => $bank->owner_address)
 } else {
 $bank = new Account($this->db);
 $bank->fetch(getDolGlobalInt('FACTURE_CHQ_NUMBER'));
-$chq=$bank;
+$chq = $bank;
 }
 }
 
