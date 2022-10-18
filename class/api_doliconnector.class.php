@@ -136,8 +136,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
   $array['outstanding_limit'] = $this->company->outstanding_limit;
   $array['remise_percent'] = $this->company->remise_percent;
        
-if (! getDolGlobalInt('PRODUIT_MULTIPRICES'))
-{      
+if (! getDolGlobalInt('PRODUIT_MULTIPRICES')) {      
   $array['price_level'] = $this->company->price_level;
 } 
   
@@ -203,19 +202,16 @@ return $array;
 					$resql = $this->db->query($sql);
       }
       
-  if (! empty($conf->global->PRODUIT_MULTIPRICES))
-{      
+if (! getDolGlobalInt('PRODUIT_MULTIPRICES')) {          
   $price_level=$this->company->price_level;
 }
 
-  if (! empty($conf->adherent->enabled))
-{ 
+if (isModEnabled('adherent')) { 
   $member=new Adherent($this->db);
   $member->fetch('','',$this->company->id,'');
 }
 
-  if (! empty($conf->agefodd->enabled))
-  { 
+if (isModEnabled('agefodd')) { 
      $sql = "SELECT s.rowid as rowid, s.fk_soc, s.entity FROM ".MAIN_DB_PREFIX."agefodd_stagiaire as s";        
      $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '".$this->company->id."' ";
 
