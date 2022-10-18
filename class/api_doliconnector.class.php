@@ -136,13 +136,12 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
   $array['outstanding_limit'] = $this->company->outstanding_limit;
   $array['remise_percent'] = $this->company->remise_percent;
        
-  if (! empty($conf->global->PRODUIT_MULTIPRICES))
+if (! getDolGlobalInt('PRODUIT_MULTIPRICES'))
 {      
   $array['price_level'] = $this->company->price_level;
 } 
   
-  if (! empty($conf->adherent->enabled))
-{  
+if (isModEnabled('adherent')) {  
   $member=new Adherent($this->db);
   $member->fetch('','',$this->company->id,'');
   $array['fk_member'] = $member->id;
@@ -150,21 +149,21 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
   $array['fk_user'] = $member->user_id;
 }
 
-  if (! empty($conf->agefodd->enabled))
-  { 
+if (isModEnabled('agefodd')) { 
      $sql = "SELECT s.rowid as rowid, s.fk_soc, s.entity FROM ".MAIN_DB_PREFIX."agefodd_stagiaire as s";        
      $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '".$array['fk_soc']."' ";
 
-$result = $this->db->query($sql);
-if ($result)
-{
-$trainee = $this->db->fetch_object($result);
-$array['fk_trainee'] = $trainee->rowid;
-} 
+  $result = $this->db->query($sql);
+  if ($result > 0)
+  {
+  $trainee = $this->db->fetch_object($result);
+  if (isset($trainee->rowid)) $array['fk_trainee'] = $trainee->rowid;
+  } 
 }
    
-        return $array;
-    }
+return $array;
+    
+}
     
      /**
      * Link a wordpress's user to a thirdparty
