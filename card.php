@@ -204,7 +204,7 @@ $email=$object->email;
 if ( $wdpr > 0 ) {
 $wordpress=new Daodoliconnector($db);
 $result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
-  			  print $result->name.' ('.$result->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&amp;action=delete&amp;delcommid='.$wdpr.'">';
+  			  print $result->name.' ('.$result->slug.') <a href="'.$_SERVER["PHP_SELF"].'?socid='.$socid.'&action=delete&token='.newToken().'&delcommid='.$wdpr.'">';
 			    print img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink');
 			    print '</a>'; 
 			}
@@ -305,7 +305,7 @@ print '<td>'.$user->email.'</td><td>';
 } elseif ( $wdpr > 0 && $wdpr == $user->id ) {
 				print $langs->trans("Sync");
 } else {
-				print '<a href="'.$_SERVER["PHP_SELF"].'?socid='.$object->id.'&amp;action=add&amp;commid='.$user->id.'">'.$langs->trans("LinkSync").'</a>';
+				print '<a href="'.$_SERVER["PHP_SELF"].'?socid='.$object->id.'&action=add&token='.newToken().'&commid='.$user->id.'">'.$langs->trans("LinkSync").'</a>';
 }
 
 print '</td></tr>'."\n";
