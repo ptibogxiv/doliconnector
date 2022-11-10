@@ -136,7 +136,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
   $array['outstanding_limit'] = $this->company->outstanding_limit;
   $array['remise_percent'] = $this->company->remise_percent;
        
-if (! getDolGlobalInt('PRODUIT_MULTIPRICES')) {      
+if (getDolGlobalInt('PRODUIT_MULTIPRICES')) {      
   $array['price_level'] = $this->company->price_level;
 } 
   
