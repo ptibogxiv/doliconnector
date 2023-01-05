@@ -112,27 +112,23 @@ print $formproduct->selectWarehouses($conf->global->DOLICONNECT_ID_WAREHOUSE, 'D
 print ' <a href="'.DOL_URL_ROOT.'/product/stock/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"]).'">('.$langs->trans("Create").')</a>';
 print '</td></tr>';
 
-$var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("AutomaticUserAssign").'</td><td>';
 print $form->select_dolusers($conf->global->DOLICONNECT_USER_AUTOMATIC, 'DOLICONNECT_USER_AUTOMATIC', 0);
 print '</td></tr>';
 
-$var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("WordpressUrl").' '.$langs->trans("as").' '.$langs->trans("Web").'</td><td>';
 print '<input size="80" type="text" name="MAIN_INFO_SOCIETE_WEB" id="MAIN_INFO_SOCIETE_WEB" value="'. dol_escape_htmltag($conf->global->MAIN_INFO_SOCIETE_WEB) . '">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
-$var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_USER").'</td><td>';
 print '<input size="80" type="text" name="DOLICONNECT_USER" value="'.$conf->global->DOLICONNECT_USER.'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
-$var=!$var;
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_PASSWORD").'</td><td>';
 print '<input size="80" type="password" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
