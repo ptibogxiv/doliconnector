@@ -965,13 +965,13 @@ if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $pa
 		}
       $paiementid = $paymentmethod;
 } else {
-$paiementid='pending';
-$error++;
+  $paiementid='pending';
+  $error++;
 }
 
-if ($error) {//|| (isset($charge->id) && $charge->statut == 'error')
-$code=$charge->code;
-$error++;
+if (isset($error)) {//|| (isset($charge->id) && $charge->statut == 'error')
+  $code=$charge->code;
+  $error++;
 } elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
 $object2 = new Facture($this->db);
 $idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
