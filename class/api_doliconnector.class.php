@@ -987,7 +987,7 @@ throw new RestException(500, $invoice->error);
 } 
 }
 
-      if (!$error && !empty($total) )
+      if (!isset($error) && !empty($total) )
       {           
 $datepaye = dol_now();
 $amounts = array(); 
@@ -1012,7 +1012,7 @@ $multicurrency_amounts=array();
 	        }
 }
 
-if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
+if (!isset($error) && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('/invoice/', $modulepart))
 			{
         $hookmanager->initHooks(array('invoicecard', 'globalcard'));
       
@@ -1029,7 +1029,7 @@ if (!$error && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_match('
 				$object2->generateDocument($modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
       
-	    if (!$error && $paiement_id > 0 && ! empty($conf->banque->enabled))
+	    if (!isset($error) && $paiement_id > 0 && ! empty($conf->banque->enabled))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
