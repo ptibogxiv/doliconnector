@@ -874,14 +874,14 @@ if (!$result) {
             throw new RestException(404, 'Order not found');
         }
 }
-if (!$error && $object->statut == 1 && $object->billed != 1) {
-$object->mode_reglement_id = $mode_reglement_id; 
-$result = $object->update(DolibarrApiAccess::$user, 1);
-if (!$result) {
-            throw new RestException(500, $object->error);
-        }
+if (!isset($error) && $object->statut == 1 && $object->billed != 1) {
+  $object->mode_reglement_id = $mode_reglement_id; 
+  $result = $object->update(DolibarrApiAccess::$user, 1);
+  if (!$result) {
+    throw new RestException(500, $object->error);
+  }
 } else {
-throw new RestException(400, 'Order already billed');
+  throw new RestException(400, 'Order already billed');
 }
 
 				if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE))
@@ -969,7 +969,7 @@ if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $pa
   $error++;
 }
 
-if (isset($error)) {//|| (isset($charge->id) && $charge->statut == 'error')
+if (isset($error)) {
   $code=$charge->code;
   $error++;
 } elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
