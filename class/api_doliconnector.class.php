@@ -891,11 +891,14 @@ throw new RestException(400, 'Order already billed');
 				// Define output language
 				$outputlangs = $langs;
 				$newlang = '';
-				if ($conf->global->MAIN_MULTILANGS && empty($newlang)) $newlang = $object->thirdparty->default_lang;
-				if (! empty($newlang)) {
-					$outputlangs = new Translate("", $conf);
-					$outputlangs->setDefaultLang($newlang);
-				}
+        if ($conf->global->MAIN_MULTILANGS && empty($newlang)) {
+          $object->fetch_thirdparty();
+          $newlang = $object->thirdparty->default_lang;
+        }
+        if (!empty($newlang)) {
+          $outputlangs = new Translate("", $conf);
+          $outputlangs->setDefaultLang($newlang);
+        }
 
 				$ret = $object->fetch($id); // Reload to get new records
         $modelpdf = !empty($object->modelpdf)?$object->modelpdf:$conf->global->COMMANDE_ADDON_PDF;
