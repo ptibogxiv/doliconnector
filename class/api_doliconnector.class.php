@@ -93,8 +93,6 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
 		//if (isASecretKey($constantname)) {
 		//	throw new RestException(403, 'Forbidden. This parameter cant be read with APIs');
 		//}
-
-
 		return $langs->trans($constantname);
 	}
 
@@ -160,8 +158,7 @@ if (isModEnabled('agefodd')) {
   } 
 }
    
-return $array;
-    
+return $array;   
 }
     
      /**
