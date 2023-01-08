@@ -969,7 +969,7 @@ if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $pa
 if (isset($error)) {
   $code=$charge->code;
   $error++;
-} elseif (!$error && preg_match('/order/', $modulepart) && $object->billed != 1) {
+} elseif (!isset($error) && preg_match('/order/', $modulepart) && $object->billed != 1) {
 $object2 = new Facture($this->db);
 $idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
