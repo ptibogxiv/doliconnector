@@ -55,7 +55,7 @@ class modDoliconnector extends DolibarrModules {
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module doliconnector";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '16.0.3';
+		$this->version = '17.0.0';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
 		$this->editor_name = 'ptibogxiv.eu';
 		$this->editor_url = 'https://www.ptibogxiv.eu';
@@ -72,7 +72,7 @@ class modDoliconnector extends DolibarrModules {
    	 	// Dependencies
     	$this->depends = array('modApi');		// List of modules id that must be enabled if this module is enabled
     	$this->requiredby = array();	// List of modules id to disable if this one is disabled
-    	$this->phpmin = array(5,6);					// Minimum version of PHP required by module
+    	$this->phpmin = array(7,0);					// Minimum version of PHP required by module
     	$this->need_dolibarr_version = array(8,0);	// Minimum version of Dolibarr required by module
     	$this->langfiles = array("doliconnector@doliconnector");
 
