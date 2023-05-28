@@ -198,7 +198,8 @@ return $array;
 					$sql .= " VALUES (".$this->company->id.", '', '".$this->db->escape($id)."', 'wordpress', '1', " . $conf->entity . ", '".$this->db->idate(dol_now())."', ".DolibarrApiAccess::$user->id.")";
 					$resql = $this->db->query($sql);
       }
-      
+
+  $price_level = 1;   
 if (! getDolGlobalInt('PRODUIT_MULTIPRICES')) {          
   $price_level=$this->company->price_level;
 }
