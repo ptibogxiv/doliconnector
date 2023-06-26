@@ -31,8 +31,8 @@ class doliconnector extends DolibarrApi
      */
     function __construct()
     {
-        global $db,$conf,$langs;
-        $this->db = $db;
+      global $db,$conf,$langs;
+      $this->db = $db;
 
 dol_include_once('/doliconnector/class/dao_doliconnector.class.php'); 
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
@@ -775,9 +775,9 @@ if (! empty($conf->stripe->enabled))
     function payObject($modulepart, $id, $paymentmethod, $paymentintent = null, $save = null)
     {
     global $langs, $conf, $hookmanager;
-      if(! DolibarrApiAccess::$user->rights->societe->creer) {
-        throw new RestException(401);
-      }
+      //if(! DolibarrApiAccess::$user->rights->societe->creer) {
+       // throw new RestException(401);
+      //}
 
 //$result = $this->company->fetch($id);
 
