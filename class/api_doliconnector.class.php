@@ -272,6 +272,7 @@ $infothirdparty =array(
             
 $list = array();
 
+$infostripe = array();
 if (isModEnabled('stripe')) {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -290,8 +291,6 @@ $stripe = new Stripe($this->db);
 $stripeacc = $stripe->getStripeAccount($service);
 $stripecu = $stripe->customerStripe($this->company, $stripeacc, $servicestatus, 1);
 
-
-$infostripe = array();
 $infostripe['live'] = $servicestatus;
 $infostripe['publishable_key'] = $publishable_key;
 $infostripe['account'] = $stripeacc;
