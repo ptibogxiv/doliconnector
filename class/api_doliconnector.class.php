@@ -502,7 +502,7 @@ $list[$rib->id]['default_source'] = $rib->default_rib;
 }
 
 $infopaypal = array();
-if (! empty($conf->paypal->enabled)) {
+if (isModEnabled('paypal')) {
 $infopaypal['live'] = null;
 $infopaypal['url'] = null;
 }
@@ -545,7 +545,7 @@ $public_url = getOnlinePaymentUrl(0, $type, $object->ref);
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
          
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -590,7 +590,7 @@ return $payment_method;
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
       
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -646,7 +646,7 @@ return $result;
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
          
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -692,7 +692,7 @@ return $result;
         throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
       }
          
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -784,7 +784,7 @@ $hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1
 $hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
 $hideref = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
  
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
 	$servicestatus = 0;
@@ -857,7 +857,7 @@ if (!$result) {
             throw new RestException(404, 'Order not found');
         }
 if ($object->statut == 0 && $object->billed != 1) {
-if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+if (isModEnabled('stock') && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
 $object->send_mail = 'on';
 $result = $object->valid(DolibarrApiAccess::$user, $idwarehouse, 0); 
 		if ($result == 0) {
@@ -939,22 +939,22 @@ throw new RestException(400, 'Modulepart not supported yet');
       }
 
 
-if (! empty($conf->stripe->enabled))
+if (isModEnabled('stripe'))
 {
 $stripecu = $stripe->getStripeCustomerAccount($this->company->id, $servicestatus, $site_account); // Get remote Stripe customer 'cus_...' (no remote access to Stripe here)
 }
 
-if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
+if ($id > 0 && isModEnabled('stripe') && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $paymentmethod))) {
       $charge = $stripe->createPaymentStripe($total, $currency, $origin, $id, $paymentmethod, $stripecu, $stripeacc, $servicestatus);
       $paiementid = $charge->id;
-} elseif ($id > 0 && preg_match('/pi_/', $paymentintent)) {
+} elseif ($id > 0 && isModEnabled('stripe') && preg_match('/pi_/', $paymentintent)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentIntent::retrieve("$paymentintent");
 		} else {
 			$charge = \Stripe\PaymentIntent::retrieve("$paymentintent", array("stripe_account" => $stripeacc));
 		}
       $paiementid = $paymentmethod;
-} elseif ($id > 0 && preg_match('/pm_/', $paymentmethod)) {
+} elseif ($id > 0 && isModEnabled('stripe') && preg_match('/pm_/', $paymentmethod)) {
 		if (empty($stripeacc)) {				// If the Stripe connect account not set, we use common API usage
     	$charge = \Stripe\PaymentMethod::retrieve("$paymentmethod");
 		} else {
@@ -963,7 +963,6 @@ if ($id > 0 && (preg_match('/src_/', $paymentmethod) || preg_match('/tok_/', $pa
       $paiementid = $paymentmethod;
 } else {
   $paiementid='pending';
-  $error++;
 }
 
 if (isset($error)) {
@@ -974,7 +973,7 @@ $object2 = new Facture($this->db);
 $idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
 {
-  if (!empty($conf->stock->enabled) && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
+  if (isModEnabled('stock') && $object2->type != Facture::TYPE_DEPOSIT && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) { $idwarehouse = $conf->global->DOLICONNECT_ID_WAREHOUSE; } else { $idwarehouse = 0; }
 	$object2->send_mail = 'on';
   $result=$object2->validate(DolibarrApiAccess::$user, '', $idwarehouse);
 	if ($result > 0) {
@@ -1029,7 +1028,7 @@ if (!isset($error) && empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE) && preg_
 				$object2->generateDocument($modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
       
-	    if (!isset($error) && $paiement_id > 0 && ! empty($conf->banque->enabled))
+	    if (!isset($error) && $paiement_id > 0 && isModEnabled('banque'))
 	    {
 	    	$label='(CustomerInvoicePayment)';
 	    	if (GETPOST('type') == 2) $label='(CustomerInvoicePaymentBack)';
@@ -1044,7 +1043,7 @@ throw new RestException(500, $paiement->errors);
 	    }          
             return array(
             'charge' => $paiementid,
-            'charge_status' => $charge->status,
+            'charge_status' => (isset($charge->status)?$charge->status:null),
             'mode_reglement_id' => $mode_reglement_id,
             'mode_reglement_code' => $mode_reglement_code,
             'status' => $object->statut,
