@@ -963,6 +963,7 @@ if ($id > 0 && isModEnabled('stripe') && (preg_match('/src_/', $paymentmethod) |
       $paiementid = $paymentmethod;
 } else {
   $paiementid='pending';
+  $error++;
 }
 
 if (isset($error)) {
