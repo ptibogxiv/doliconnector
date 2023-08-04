@@ -783,7 +783,7 @@ if (isModEnabled('stripe'))
 $hidedetails = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DETAILS) ? 1 : 0);
 $hidedesc = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_DESC) ? 1 : 0);
 $hideref = (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_HIDE_REF) ? 1 : 0);
- 
+$error = null;
 if (isModEnabled('stripe'))
 {
 	$service = 'StripeTest';
@@ -966,10 +966,7 @@ if ($id > 0 && isModEnabled('stripe') && (preg_match('/src_/', $paymentmethod) |
   $error++;
 }
 
-if (isset($error)) {
-  $code=$charge->code;
-  $error++;
-} elseif (!isset($error) && preg_match('/order/', $modulepart) && $object->billed != 1) {
+if (!isset($error) && preg_match('/order/', $modulepart) && $object->billed != 1) {
 $object2 = new Facture($this->db);
 $idinv=$object2->createFromOrder($object, DolibarrApiAccess::$user);
 if ($idinv > 0)
@@ -1041,7 +1038,8 @@ throw new RestException(500, $paiement->errors);
         if (preg_match('/order/', $modulepart) && empty($conf->global->WORKFLOW_INVOICE_AMOUNT_CLASSIFY_BILLED_ORDER)) {
         $object->classifyBilled(DolibarrApiAccess::$user);
         }                     
-	    }          
+	    }  
+      $object->fetch($id);        
             return array(
             'charge' => $paiementid,
             'charge_status' => (isset($charge->status)?$charge->status:null),
