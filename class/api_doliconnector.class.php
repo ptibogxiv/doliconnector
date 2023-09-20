@@ -311,7 +311,7 @@ if (isset($stripecu->id) &&!empty($stripecu->id)) {
 		} else {
 			$listofpaymentmethods2 = \Stripe\PaymentMethod::all(array("customer" => $stripecu->id, "type" => "sepa_debit"), array("stripe_account" => $stripeacc));
 		}
-$listofpaymentmethods3 = $stripecu->sources->data;
+    if (isset($stripecu->sources) && isset($stripecu->sources->data)) $listofpaymentmethods3 = $stripecu->sources->data;
 }
 
 if ( empty($type) && empty($rowid) && !empty($id) ) {
