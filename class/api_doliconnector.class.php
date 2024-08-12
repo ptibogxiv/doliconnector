@@ -167,11 +167,13 @@ return $array;
      * @param int $id               ID of wordpress user
      * @param string $email         Email {@from body}
      * @param string $name         Name {@from body}
+     * @param int $client         Client {@from body}
+     * @param int $status         Status {@from body}
      * @return int  ID of subscription
      *
      * @url POST {id}
      */
-    function linkThirdparty($id, $email, $name)
+    function linkThirdparty($id, $email, $name, $client = 1, $status = 1)
     {
         global $user,$conf;
        
@@ -183,8 +185,8 @@ return $array;
       if ( !$this->company->id > 0 ) {
       $this->company->name = $name;
       $this->company->email = $email;
-      $this->company->client = 1;
-      $this->company->status = 1;
+      $this->company->client = $client;
+      $this->company->status = $status;
       $this->company->code_client = -1;
       $fk_soc=$this->company->create(DolibarrApiAccess::$user);
       $this->company->fetch($fk_soc);
