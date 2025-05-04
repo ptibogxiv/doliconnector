@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2017-2019 	Thibault FOUCART        <support@ptibogxiv.net>
+/* Copyright (C) 2017-2025 	Thibault FOUCART        <support@ptibogxiv.eu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,71 +95,6 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
 		//}
 		return $langs->trans($constantname);
 	}
-
-    /**
-     * Get properties of an thirparty / wordpress's user
-     *
-     * Return an array with entity informations
-     *
-     * @param     int     $id ID of wordpress user
-     * @return    array|mixed data without useless information
-     *
-     * @throws    RestException
-     */
-    function get($id)
-    {
-        global $user,$conf;     
-        $user = DolibarrApiAccess::$user;
-
-        if ( $id <= 0 ) {
-            throw new RestException(404, 'wordpress #'.$id.' not found');
-        }
-
-        $array = array();
-
-        $doliconnector = new Daodoliconnector($this->db);
-        if ($id > 0) {
-        $array['fk_soc'] = $doliconnector->getThirdparty($id, '1');
-        $array['fk_order'] = $doliconnector->doliconnectorder($array['fk_soc']);
-        $array['fk_order_nb_item'] = $doliconnector->doliconnectorderitem($doliconnector->doliconnectorder($array['fk_soc']));
-        }   
-        $doliconnector = new Daodoliconnector($this->db);
-        $societeaccount = new SocieteAccount($this->db);
-        $wdpr = $societeaccount->getCustomerAccount($array['fk_soc'], 'wordpress', '1');
- 
-        if ( ! $wdpr && !empty($array['fk_soc'])  ) {
-            throw new RestException(404, 'wordpress #'.$id.' not found');
-        }
-	$this->company->fetch($array['fk_soc']);
-  $array['outstanding_limit'] = $this->company->outstanding_limit;
-  $array['remise_percent'] = $this->company->remise_percent;
-       
-if (getDolGlobalInt('PRODUIT_MULTIPRICES')) {      
-  $array['price_level'] = $this->company->price_level;
-} 
-  
-if (isModEnabled('adherent')) {  
-  $member=new Adherent($this->db);
-  $member->fetch('','',$this->company->id,'');
-  $array['fk_member'] = $member->id;
-  $array['member_end'] = $member->datefin;
-  $array['fk_user'] = $member->user_id;
-}
-
-if (isModEnabled('agefodd')) { 
-     $sql = "SELECT s.rowid as rowid, s.fk_soc, s.entity FROM ".MAIN_DB_PREFIX."agefodd_stagiaire as s";        
-     $sql.= " WHERE s.entity IN (" . getEntity('agefodd') . ") AND s.fk_soc = '".$array['fk_soc']."' ";
-
-  $result = $this->db->query($sql);
-  if ($result > 0)
-  {
-  $trainee = $this->db->fetch_object($result);
-  if (isset($trainee->rowid)) $array['fk_trainee'] = $trainee->rowid;
-  } 
-}
-   
-return $array;   
-}
     
      /**
      * Link a wordpress's user to a thirdparty
