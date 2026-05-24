@@ -67,16 +67,12 @@ class Actionsdoliconnector
 			}
 		}
 
-		if (is_object($object) && $object->element == 'societe')
-		{ 
-			if ($action == 'create' || $action == 'editparentwordpress')
-			{
+		if (is_object($object) && $object->element == 'societe') { 
+			if ($action == 'create' || $action == 'editparentwordpress') {
 				$this->resprints.= '<tr><td>'.fieldLabel('LinkedToWordpress','linked_entity').'</td><td colspan="3" class="maxwidthonsmartphone">';
 				$this->resprints.= $form->textwithpicto('',$langs->trans("LinkedToWordpressDesc"),1);
 				$this->resprints.= '</td></tr>';
-			}
-			else
-			{
+			} else {
 				$this->resprints.= '<tr><td>';
 				$this->resprints.= '<table width="100%" class="nobordernopadding"><tr><td>';
 				$this->resprints.= $form->textwithpicto($langs->trans('LinkedToWordpress'),$langs->trans("LinkedToWordpressDesc"),1);
@@ -86,23 +82,20 @@ class Actionsdoliconnector
 				$this->resprints.= '</td>';
 				$this->resprints.= '<td colspan="3">';
         
-		include_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
-		$societeaccount = new SocieteAccount($this->db);
-		$wdpr = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
+				include_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
+				$societeaccount = new SocieteAccount($this->db);
+				$wdpr = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
     
-if ( $wdpr > 0 ) {
-$wordpress=new Daodoliconnector($this->db);
-$result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
-//$this->resprints.= var_dump($result);
-$this->resprints.= $result->name.' ('.$result->slug.'), '.$result->email;
-
-} else {
-$this->resprints.= $langs->trans("NoSync");
-		} 
-				$this->resprints.= '</td></tr>';
+				if ( $wdpr > 0 ) {
+					$wordpress=new Daodoliconnector($this->db);
+					$result=$wordpress->doliconnectSync('GET', '/users/'.$wdpr.'/?context=edit', '');
+					$this->resprints.= $result->name.' ('.$result->slug.'), '.$result->email;
+				} else {
+					$this->resprints.= $langs->trans("NoSync");
+				} 
+					$this->resprints.= '</td></tr>';
 			}
 		} 
-
 		return 0;
 	}
 
