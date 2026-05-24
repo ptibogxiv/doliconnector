@@ -123,29 +123,44 @@ public function doliconnectorderitem($id)
   
 public function doliconnectSync($method, $url, $data = null)
 { 
-global $conf;
+	global $conf;
 
-if (empty($conf->global->DOLICONNECT_ALTERNATIVE_ENTITY)){
-		$altentity = $conf->entity;
- }else{
-		$altentity = $conf->global->DOLICONNECT_ALTERNATIVE_ENTITY;
-}
+	if (empty($conf->global->DOLICONNECT_ALTERNATIVE_ENTITY)){
+			$altentity = $conf->entity;
+	}else{
+			$altentity = $conf->global->DOLICONNECT_ALTERNATIVE_ENTITY;
+	}
 
-$url=$conf->global->MAIN_INFO_SOCIETE_WEB."/wp-json/wp/v2".$url;
+	$url=$conf->global->MAIN_INFO_SOCIETE_WEB."/wp-json/wp/v2".$url;
 
-$curl=curl_init();
-curl_setopt($curl,CURLOPT_CUSTOMREQUEST, $method);
-curl_setopt($curl,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063');
-curl_setopt($curl,CURLOPT_URL,$url);
-if ($data) curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,2); 
-curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-$httpheader = ['Authorization: Basic ' . base64_encode( ''.$conf->global->DOLICONNECT_USER.':'.$conf->global->DOLICONNECT_PASSWORD.'' )];
-$httpheader[] = "Content-Type:application/json";
-curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheader);
-$response = curl_exec($curl);
-curl_close($curl);
-return json_decode($response);
+	$curl = curl_init();
+	curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
+	curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063' );
+	curl_setopt( $curl, CURLOPT_URL, $url );
+
+	if ( $data ) {
+		curl_setopt( $curl, CURLOPT_POSTFIELDS, json_encode( $data ) );
+	}
+
+	curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, 2 );
+	curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
+
+	$username = trim( (string) $conf->global->DOLICONNECT_USER );
+	$password = trim( (string) $conf->global->DOLICONNECT_PASSWORD );
+
+	if ( '' !== $username && '' !== $password ) {
+		curl_setopt( $curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
+		curl_setopt( $curl, CURLOPT_USERPWD, $username . ':' . $password );
+	} else {
+		dol_syslog( __METHOD__ . ' missing DOLICONNECT_USER or DOLICONNECT_PASSWORD credentials', LOG_ERR );
+	}
+
+	curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json' ) );
+
+	$response = curl_exec( $curl );
+	curl_close( $curl );
+
+	return json_decode( $response );
 }
 
 	/**
