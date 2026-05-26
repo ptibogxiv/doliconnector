@@ -119,20 +119,27 @@ print '</td></tr>';
 
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("WordpressUrl").' '.$langs->trans("as").' '.$langs->trans("Web").'</td><td>';
-print '<input size="80" type="text" name="MAIN_INFO_SOCIETE_WEB" id="MAIN_INFO_SOCIETE_WEB" value="'. dol_escape_htmltag($conf->global->MAIN_INFO_SOCIETE_WEB) . '">';
+print '<input size="80" type="text" name="MAIN_INFO_SOCIETE_WEB" id="MAIN_INFO_SOCIETE_WEB" value="'. dol_escape_htmltag(getDolGlobalString('MAIN_INFO_SOCIETE_WEB')) . '">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_USER").'</td><td>';
-print '<input size="80" type="text" name="DOLICONNECT_USER" value="'.$conf->global->DOLICONNECT_USER.'">';
+print '<input size="80" type="text" name="DOLICONNECT_USER" value="'.getDolGlobalString('DOLICONNECT_USER').'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
 print '</td></tr>';
 
 print '<tr class="oddeven"><td class="fieldrequired">';
 print $langs->trans("DOLICONNECT_PASSWORD").'</td><td>';
-print '<input size="80" type="password" name="DOLICONNECT_PASSWORD" value="'.$conf->global->DOLICONNECT_PASSWORD.'">';
+print '<input size="80" type="password" name="DOLICONNECT_PASSWORD" value="'.getDolGlobalString('DOLICONNECT_PASSWORD').'">';
 //print '<br />'.$langs->trans("Example").': https://www.votredomaine.com/';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td class="fieldrequired">';
+print $langs->trans("Status").'</td><td>';
+    $wordpress=new Daodoliconnector($db);
+	$result = $wordpress->doliconnectSync('GET', '/doliconnect/status', '');
+print var_dump($result);
 print '</td></tr>';
 
 print '</table>';
