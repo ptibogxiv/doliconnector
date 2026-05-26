@@ -151,7 +151,17 @@ if (isset($result->ok))$ok=$result->ok;
 if ($action == 'COMPANY_DELETE') {
 //NO ACTION
 
-}  
+} 
+
+if ($action == 'PRODUCT_MODIFY') {
+//NO ACTION
+
+} 
+
+if ($action == 'PRODUCT_DELETE') {
+//NO ACTION
+
+} 
           
 if ($action == 'MEMBER_MODIFY') {
 			dol_syslog(
