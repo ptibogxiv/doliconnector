@@ -30,9 +30,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/triggers/dolibarrtriggers.class.php';
 dol_include_once('/doliconnector/class/dao_doliconnector.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
-$path=dirname(__FILE__).'/'; 
+
 /**
- *  Class of triggers for ticketsup module
+ *  Class of triggers for doliconnector module
  */
 class Interfacedoliconnector extends DolibarrTriggers
 {
@@ -49,60 +49,57 @@ class Interfacedoliconnector extends DolibarrTriggers
     public function __construct($db)
     {
         $this->db = $db;
-
         $this->name = preg_replace('/^Interface/i', '', get_class($this));
-        $this->family = "doliconnector";
-        $this->description = "Triggers of the module doliconnector";
-        $this->version = 'dolibarr'; // 'development', 'experimental', 'dolibarr' or version
-//       $this->picto = 'doliconnector@doliconnector';
+        $this->family = 'doliconnector';
+        $this->description = 'Triggers of the module doliconnector';
+        $this->version = 'dolibarr';
     }
 
-	/**
-	 * Trigger name
-	 *
-	 * @return string Name of trigger file
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
-
-
-	/**
-	 * Trigger description
-	 *
-	 * @return string Description of trigger file
-	 */
-	public function getDesc()
-	{
-		return $this->description;
-	}
-
-	/**
-	 * Trigger version
-	 *
-	 * @return string Version of trigger file
-	 */
-	public function getVersion()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($this->version == 'development') {
-			return $langs->trans("Development");
-		} elseif ($this->version == 'experimental') {
-			return $langs->trans("Experimental");
-		} elseif ($this->version == 'dolibarr') {
-			return DOL_VERSION;
-		} elseif ($this->version) {
-			return $this->version;
-		} else {
-			return $langs->trans("Unknown");
-		}
-	}
+    /**
+     * Trigger name
+     *
+     * @return string Name of trigger file
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
-     * Function called when a Dolibarrr business event is done.
+     * Trigger description
+     *
+     * @return string Description of trigger file
+     */
+    public function getDesc()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Trigger version
+     *
+     * @return string Version of trigger file
+     */
+    public function getVersion()
+    {
+        global $langs;
+        $langs->load('admin');
+
+        if ($this->version === 'development') {
+            return $langs->trans('Development');
+        } elseif ($this->version === 'experimental') {
+            return $langs->trans('Experimental');
+        } elseif ($this->version === 'dolibarr') {
+            return DOL_VERSION;
+        } elseif ($this->version) {
+            return $this->version;
+        }
+
+        return $langs->trans('Unknown');
+    }
+
+    /**
+     * Function called when a Dolibarr business event is done.
      * All functions "runTrigger" are triggered if file
      * is inside directory core/triggers
      *
@@ -115,78 +112,94 @@ class Interfacedoliconnector extends DolibarrTriggers
      */
     public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
     {
-		// Put here code you want to execute when a Dolibarr business events occurs.
-		// Data and type of action are stored into $object and $action
-global $db,$conf;
+        if (empty($object) || empty($object->id)) {
+            return 0;
+        }
 
-/** Users */
-$ok=0;      
-if ($action == 'COMPANY_MODIFY') {
-			dol_syslog(
-				"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
-			);
-    
-	if ($object->id > 0)
-	{ 
-		$societeaccount = new SocieteAccount($db);
-		$wdpr = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
+        $db = $this->db;
+        $result = 0;
 
-if ( $wdpr > 0 ) {
-$wordpress=new Daodoliconnector($db);
-$data = array(
-    'name'  => trim($object->name),
-    'email' => trim($object->email),
-    'url' => trim($object->url),  
-    'locale' => $object->default_lang,  
-);
-//if (!empty($object->default_lang)) $data[locale] .= $object->default_lang;
+        switch ($action) {
+            case 'COMPANY_MODIFY':
+                $result = $this->syncCompanyToWordpress($object, $db);
+                break;
+            case 'MEMBER_MODIFY':
+                $result = $this->syncMemberToWordpress($object, $db);
+                break;
+            default:
+                break;
+        }
 
-$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
-if (isset($result->ok))$ok=$result->ok;
-}
-  }
+        return $result > 0 ? 1 : 0;
+    }
 
-} 
-     
-if ($action == 'COMPANY_DELETE') {
-//NO ACTION
+    protected function syncCompanyToWordpress($object, $db)
+    {
+        dol_syslog("Trigger '" . $this->name . "' for action 'COMPANY_MODIFY' launched by " . __FILE__ . ". id=" . $object->id);
 
-} 
+        $societeaccount = new SocieteAccount($db);
+        $wordpressId = $societeaccount->getCustomerAccount($object->id, 'wordpress', '1');
 
-if ($action == 'PRODUCT_MODIFY') {
-//NO ACTION
+        if (empty($wordpressId) || $wordpressId <= 0) {
+            return 0;
+        }
 
-} 
+        $data = array(
+            'name'   => trim($object->name),
+            'email'  => trim($object->email),
+            'url'    => trim($object->url),
+            'locale' => !empty($object->default_lang) ? trim($object->default_lang) : null,
+        );
 
-if ($action == 'PRODUCT_DELETE') {
-//NO ACTION
+        $data = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
 
-} 
-          
-if ($action == 'MEMBER_MODIFY') {
-			dol_syslog(
-				"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
-			);
-     
-	if ($object->fk_soc > 0)
-	{  
-		$societeaccount = new SocieteAccount($db);
-		$wdpr = $societeaccount->getCustomerAccount($object->fk_soc, 'wordpress', '1');
+        return $this->syncWordpressUser($wordpressId, $data, $db);
+    }
 
-if ( $wdpr > 0 ) {
-$wordpress=new Daodoliconnector($db);
-$data = array(
-    'first_name'  => trim($object->firstname),
-    'last_name'  => trim($object->lastname),
-    'email' => trim($object->email),
-    'url' => trim($object->url),  
-);
-$result=$wordpress->doliconnectSync('PUT', '/users/'.$wdpr, $data);
-if (isset($result->ok))$ok=$result->ok;
-}     
-  } 
-}
+    protected function syncMemberToWordpress($object, $db)
+    {
+        dol_syslog("Trigger '" . $this->name . "' for action 'MEMBER_MODIFY' launched by " . __FILE__ . ". id=" . $object->fk_soc);
 
-}
+        if (empty($object->fk_soc) || $object->fk_soc <= 0) {
+            return 0;
+        }
 
+        $societeaccount = new SocieteAccount($db);
+        $wordpressId = $societeaccount->getCustomerAccount($object->fk_soc, 'wordpress', '1');
+
+        if (empty($wordpressId) || $wordpressId <= 0) {
+            return 0;
+        }
+
+        $data = array(
+            'first_name' => trim($object->firstname),
+            'last_name'  => trim($object->lastname),
+            'email'      => trim($object->email),
+            'url'        => trim($object->url),
+        );
+
+        $data = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        return $this->syncWordpressUser($wordpressId, $data, $db);
+    }
+
+    protected function syncWordpressUser($wordpressId, array $data, $db)
+    {
+        if (empty($data)) {
+            return 0;
+        }
+
+        $wordpress = new Daodoliconnector($db);
+        $result = $wordpress->doliconnectSync('PUT', '/users/' . $wordpressId, $data);
+
+        if (is_object($result) && !empty($result->ok)) {
+            return 1;
+        }
+
+        return 0;
+    }
 }

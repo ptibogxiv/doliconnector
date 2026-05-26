@@ -75,7 +75,7 @@ class Actionsdoliconnector
 			} else {
 				$this->resprints.= '<tr><td>';
 				$this->resprints.= '<table width="100%" class="nobordernopadding"><tr><td>';
-				$this->resprints.= $form->textwithpicto($langs->trans('LinkedToWordpress'),$langs->trans("LinkedToWordpressDesc"),1);
+				$this->resprints.= $form->textwithpicto($langs->trans('LinkedToWordpress').' ('.getDolGlobalString('MAIN_INFO_SOCIETE_WEB').')',$langs->trans("LinkedToWordpressDesc"),1);
 				$this->resprints.= '</td><td align="right">';
 				$this->resprints.= '<a class="editfielda" href="'.dol_buildpath('custom/doliconnector/card.php?socid='.$object->id, 1).'">'.img_edit($langs->transnoentitiesnoconv('Edit'), 1).'</a>';
 				$this->resprints.= '</td></tr></table>';

@@ -125,13 +125,13 @@ public function doliconnectSync($method, $url, $data = null)
 { 
 	global $conf;
 
-	if (empty($conf->global->DOLICONNECT_ALTERNATIVE_ENTITY)){
+	if (!getDolGlobalInt('DOLICONNECT_ALTERNATIVE_ENTITY')){
 			$altentity = $conf->entity;
 	}else{
-			$altentity = $conf->global->DOLICONNECT_ALTERNATIVE_ENTITY;
+			$altentity = getDolGlobalInt('DOLICONNECT_ALTERNATIVE_ENTITY');
 	}
 
-	$url=$conf->global->MAIN_INFO_SOCIETE_WEB."/wp-json/wp/v2".$url;
+	$url = getDolGlobalString('MAIN_INFO_SOCIETE_WEB')."/wp-json/wp/v2".$url;
 
 	$curl = curl_init();
 	curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, $method );
@@ -145,8 +145,8 @@ public function doliconnectSync($method, $url, $data = null)
 	curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, 2 );
 	curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
 
-	$username = trim( (string) $conf->global->DOLICONNECT_USER );
-	$password = trim( (string) $conf->global->DOLICONNECT_PASSWORD );
+	$username = trim( (string) getDolGlobalString('DOLICONNECT_USER') );
+	$password = trim( (string) getDolGlobalString('DOLICONNECT_PASSWORD') );
 
 	if ( '' !== $username && '' !== $password ) {
 		curl_setopt( $curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
