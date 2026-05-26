@@ -188,7 +188,7 @@ public function doliconnectSync($method, $url, $data = null)
 		$listofordersok = array();
 		$listofordersko = array();
         
-		if (empty($conf->commande->enabled)) // Should not happen. If module disabled, cron job should not be visible.
+		if (!isModEnabled('commande')) // Should not happen. If module disabled, cron job should not be visible.
 		{
 			$langs->load("order");
 			$this->output = $langs->trans('ModuleNotEnabled', $langs->transnoentitiesnoconv("Commande"));
@@ -217,7 +217,7 @@ public function doliconnectSync($method, $url, $data = null)
             {
       $obj = $this->db->fetch_object($result);
       
-      if (!empty($conf->multicompany->enabled) && is_object($mc) && $obj->entity != $conf->entity) {
+      if (isModEnabled('multicompany') && is_object($mc) && $obj->entity != $conf->entity) {
       $ret = $mc->switchEntity($obj->entity);
       }
 
