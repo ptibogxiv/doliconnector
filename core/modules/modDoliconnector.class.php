@@ -65,6 +65,8 @@ class modDoliconnector extends DolibarrModules {
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/images directory, use this->picto=DOL_URL_ROOT.'/module/images/file.png'
 		$this->picto = 'doliconnector@doliconnector';
+		//Url to the file with your last numberversion of this module
+		$this->url_last_version = 'https://www.ptibogxiv.eu/versionmodules/doliconnector.txt';
 		
     
    	 	// Dependencies
