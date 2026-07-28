@@ -51,11 +51,11 @@ class modDoliconnector extends DolibarrModules {
 		// Can be enabled / disabled only in the main company with superadmin account
 		$this->core_enabled = 1;
 		// Module label, used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
-		$this->name = preg_replace('/^mod/i', '', get_class($this));
+		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module doliconnector";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '22.0.0';
+		$this->version = '2026.0.0';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
 		$this->editor_name = 'ptibogxiv.eu';
 		$this->editor_url = 'https://www.ptibogxiv.eu';
@@ -66,7 +66,7 @@ class modDoliconnector extends DolibarrModules {
 		// If file is in module/images directory, use this->picto=DOL_URL_ROOT.'/module/images/file.png'
 		$this->picto = 'doliconnector@doliconnector';
 		//Url to the file with your last numberversion of this module
-		$this->url_last_version = 'https://www.ptibogxiv.eu/versionmodules/doliconnector.txt';
+		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_lastversion&package_id='.$this->name.'&installed_version='.$this->version.'&update_type=Generic';
 		
     
    	 	// Dependencies
