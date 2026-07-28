@@ -66,7 +66,7 @@ class modDoliconnector extends DolibarrModules {
 		// If file is in module/images directory, use this->picto=DOL_URL_ROOT.'/module/images/file.png'
 		$this->picto = 'doliconnector@doliconnector';
 		//Url to the file with your last numberversion of this module
-		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_lastversion&package_id='.$this->name.'&installed_version='.$this->version.'&php='.htmlspecialchars(phpversion()).'&locale='.htmlspecialchars($langs->defaultlang()).'&checking_for_updates=1&update_type=Generic';
+		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_lastversion&package_id='.$this->name.'&installed_version='.$this->version.'&php='.htmlspecialchars(phpversion()).'&locale='.getDolGlobalString('MAIN_LANG_DEFAULT').'&checking_for_updates=1&update_type=Generic';
 		
     
    	 	// Dependencies
