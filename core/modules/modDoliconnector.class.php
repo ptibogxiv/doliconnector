@@ -53,7 +53,7 @@ class modDoliconnector extends DolibarrModules {
 		// Module label, used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Module doliconnector";
+		$this->description = "Module Doliconnector for better integration between Dolibarr, Wordpress and Doliconnect";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
 		$this->version = '2026.0.0';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
@@ -66,13 +66,13 @@ class modDoliconnector extends DolibarrModules {
 		// If file is in module/images directory, use this->picto=DOL_URL_ROOT.'/module/images/file.png'
 		$this->picto = 'doliconnector@doliconnector';
 		//Url to the file with your last numberversion of this module
-		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_lastversion&package_id='.$this->name.'&installed_version='.$this->version.'&update_type=Generic';
+		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_lastversion&package_id='.$this->name.'&installed_version='.$this->version.'&php='.phpversion().'&locale=en_US&checking_for_updates=1&update_type=Generic';
 		
     
    	 	// Dependencies
     	$this->depends = array('modApi');		// List of modules id that must be enabled if this module is enabled
     	$this->requiredby = array();	// List of modules id to disable if this one is disabled
-    	$this->phpmin = array(7,0);					// Minimum version of PHP required by module
+    	$this->phpmin = array(8,0);					// Minimum version of PHP required by module
     	$this->need_dolibarr_version = array(19,0);	// Minimum version of Dolibarr required by module
     	$this->langfiles = array("doliconnector@doliconnector");
 
