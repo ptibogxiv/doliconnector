@@ -55,7 +55,7 @@ class modDoliconnector extends DolibarrModules {
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module Doliconnector for better integration between Dolibarr, Wordpress and Doliconnect";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '2026.0.1';
+		$this->version = '2026.0.2';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
 		$this->editor_name = 'ptibogxiv.eu';
 		$this->editor_url = 'https://ptibogxiv.eu';
