@@ -55,10 +55,10 @@ class modDoliconnector extends DolibarrModules {
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module Doliconnector for better integration between Dolibarr, Wordpress and Doliconnect";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.0.0';
+		$this->version = '2026.0.1';
 		// Module description used if translation string 'ModuleXXXDesc' not found (XXX is id value)
 		$this->editor_name = 'ptibogxiv.eu';
-		$this->editor_url = 'https://www.ptibogxiv.eu';
+		$this->editor_url = 'https://ptibogxiv.eu';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
 		// Name of image file used for this module.
@@ -66,8 +66,7 @@ class modDoliconnector extends DolibarrModules {
 		// If file is in module/images directory, use this->picto=DOL_URL_ROOT.'/module/images/file.png'
 		$this->picto = 'doliconnector@doliconnector';
 		//Url to the file with your last numberversion of this module
-		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_metadata&package_id='.$this->name.'&installed_version='.$this->version.'&php='.htmlspecialchars(phpversion()).'&locale='.getDolGlobalString('MAIN_LANG_DEFAULT').'&checking_for_lastversion=1&update_type=Generic';
-		
+		$this->url_last_version = 'https://ptibogxiv.eu/updatepulse-server-update-api/?action=get_metadata&package_id='.strtolower($this->name).'&installed_version='.$this->version.'&php='.htmlspecialchars(phpversion()).'&locale='.getDolGlobalString('MAIN_LANG_DEFAULT').'&checking_for_lastversion=1&update_type=Generic';
     
    	 	// Dependencies
     	$this->depends = array('modApi');		// List of modules id that must be enabled if this module is enabled
